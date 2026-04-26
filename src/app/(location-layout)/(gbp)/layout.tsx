@@ -73,8 +73,9 @@ const GBP_SECTIONS = [
   { id: "reviews", label: "Reviews", icon: MessageSquare, href: "/reviews" },
   { id: "posts", label: "Posts", icon: FileText, href: "/posts" },
   { id: "keywords", label: "Keywords", icon: Search, href: "/keywords" },
-  { id: "search-rankings", label: "Search Rankings", icon: BarChart3, href: "/search-rankings" },
-  { id: "competitors", label: "Competitors", icon: Users2, href: "/competitors" },
+  // { id: "search-rankings", label: "Search Rankings", icon: BarChart3, href: "/search-rankings" },
+  // { id: "competitors", label: "Competitors", icon: Users2, href: "/competitors" },
+  { id: "ranking-grid", label: "Ranking Grid", icon: LayoutGrid, href: "/ranking-grid" },
 ];
 
 function getInitials(name?: string | null): string {
@@ -188,10 +189,10 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="flex min-h-screen bg-[var(--bg-page)]">
+    <div className="flex min-h-screen bg-gradient-to-b from-[var(--bg-page)] via-[var(--bg-surface)] to-[var(--bg-page)]">
       <div className="flex flex-1 flex-col min-w-0">
         {/* ── Header ──────────────────────────────────────────────────────── */}
-        <header className="flex h-14 shrink-0 items-center gap-4 border-b border-border px-4 sm:px-6 justify-between">
+        <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center justify-between gap-4 border-b border-border/80 bg-background/85 px-4 backdrop-blur-sm sm:px-6">
           {/* Logo + org */}
           <div className="flex items-center gap-2 shrink-0">
             <Link href="/dashboard" className="font-display text-lg font-bold text-[var(--text-primary)]">
@@ -380,9 +381,9 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* ── Body ────────────────────────────────────────────────────────── */}
-        <div className="w-full flex-1 min-w-0 flex flex-col md:flex-row gap-6 p-4 sm:p-6 md:items-start">
+        <div className="flex min-w-0 w-full flex-1 flex-col gap-6 p-4 sm:p-6 md:flex-row md:items-start">
           {/* Sidebar nav */}
-          <nav className="flex flex-row bg-background md:flex-col gap-1 md:gap-2 px-0 md:p-4 w-full md:w-64 shrink-0 h-auto overflow-x-auto md:overflow-visible md:border md:rounded-xl md:sticky md:top-6 md:h-fit">
+          <nav className="flex h-auto w-full shrink-0 flex-row gap-1 overflow-x-auto rounded-xl border border-border/70 bg-background/90 p-1 shadow-sm md:sticky md:top-20 md:h-fit md:w-64 md:flex-col md:gap-2 md:overflow-visible md:p-3">
             {GBP_SECTIONS.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -394,10 +395,10 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
                   key={item.id}
                   href={item.href}
                   className={cn(
-                    "w-auto md:w-full inline-flex items-center justify-start gap-2 px-3 py-2 text-sm transition-colors whitespace-nowrap border-b-2 md:border-b-0",
+                    "inline-flex w-auto items-center justify-start gap-2 whitespace-nowrap border-b-2 px-3 py-2 text-sm transition-colors md:w-full md:border-b-0",
                     isActive
-                      ? "border-brand-500 text-brand-600 md:bg-soft-brand-bg md:text-soft-brand-text md:rounded-md md:border-none"
-                      : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] md:hover:bg-[var(--bg-subtle)] md:rounded-md"
+                      ? "border-brand-500 text-brand-600 md:rounded-lg md:border-none md:bg-soft-brand-bg md:text-soft-brand-text md:shadow-sm"
+                      : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] md:rounded-lg md:hover:bg-[var(--bg-subtle)]"
                   )}
                 >
                   <Icon className="h-4 w-4 shrink-0" />
@@ -408,7 +409,7 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
           </nav>
 
           {/* Page content */}
-          <main className="grow min-w-0 w-full text-start border border-border rounded-xl">
+          <main className="min-w-0 w-full grow overflow-hidden rounded-2xl border border-border/70 bg-background/85 text-start shadow-sm">
             {children}
           </main>
         </div>

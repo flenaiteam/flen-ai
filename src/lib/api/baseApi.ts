@@ -250,7 +250,7 @@ const baseQueryWithReauth: BaseQueryFn<
 const baseApi = createApi({
   reducerPath: 'baseApi',
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['Auth', 'Organization', 'Location', 'GBP'],
+  tagTypes: ['Auth', 'Organization', 'Location', 'GBP', 'RankingGrid'],
   keepUnusedDataFor: 60,
   endpoints: (builder) => ({
     // ── Auth ──────────────────────────────────────────────────────────────────
@@ -317,6 +317,12 @@ const baseApi = createApi({
       transformResponse: (res: { data?: Location } | Location) =>
         (res as { data?: Location }).data ?? (res as Location),
       invalidatesTags: ['Location'],
+    }),
+
+    getLocationContext: builder.query<unknown, string>({
+      query: (locationPublicId) =>
+        `/organizations/locations/${locationPublicId}/location-context/`,
+      providesTags: ['Location'],
     }),
 
     // ── GBP ───────────────────────────────────────────────────────────────────
@@ -603,6 +609,115 @@ const baseApi = createApi({
       providesTags: ['GBP'],
     }),
 
+    // ── Ranking Grid (Local Grid / Whitespark-style) ─────────────────────────
+    getRankingGrids: builder.query<import('@/types/rankingGrid').RankingGridOut[], string>({
+      query: (locationPublicId) => `/organizations/locations/${locationPublicId}/ranking-grids/`,
+      providesTags: ['RankingGrid'],
+    }),
+
+    createRankingGrid: builder.mutation<
+      import('@/types/rankingGrid').RankingGridOut,
+      { locationPublicId: string; keyword_id: number; grid_size: number; radius_km: number }
+    >({
+      query: ({ locationPublicId, keyword_id, grid_size, radius_km }) => ({
+        url: `/organizations/locations/${locationPublicId}/ranking-grids/`,
+        method: 'POST',
+        body: { keyword_id, grid_size, radius_km },
+      }),
+      transformResponse: (response: unknown) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          const wrapped = response as { data?: import('@/types/rankingGrid').RankingGridOut };
+          if (wrapped.data) return wrapped.data;
+        }
+        return response as import('@/types/rankingGrid').RankingGridOut;
+      },
+      invalidatesTags: ['RankingGrid'],
+    }),
+
+    triggerRankingGridScan: builder.mutation<
+      import('@/types/rankingGrid').RankingGridTriggerScanResponse,
+      string
+    >({
+      query: (gridPublicId) => ({
+        url: `/organizations/ranking-grids/${gridPublicId}/scan/`,
+        method: 'POST',
+      }),
+      transformResponse: (response: unknown) => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          const wrapped = response as {
+            data?: import('@/types/rankingGrid').RankingGridTriggerScanResponse;
+          };
+          if (wrapped.data) return wrapped.data;
+        }
+        return response as import('@/types/rankingGrid').RankingGridTriggerScanResponse;
+      },
+      invalidatesTags: ['RankingGrid'],
+    }),
+
+    getRankingGridScans: builder.query<import('@/types/rankingGrid').RankingGridScanOut[], string>({
+      query: (gridPublicId) => `/organizations/ranking-grids/${gridPublicId}/scans/`,
+      providesTags: ['RankingGrid'],
+    }),
+
+    getMergedRankingGridScansForKeyword: builder.query<
+      import('@/types/rankingGrid').MergedRankingGridScanRow[],
+      { keywordId: number; grids: import('@/types/rankingGrid').RankingGridOut[] }
+    >({
+      queryFn: async ({ grids }, _api, _extraOptions, fetchWithBQ) => {
+        type ScanOut = import('@/types/rankingGrid').RankingGridScanOut;
+        type Merged = import('@/types/rankingGrid').MergedRankingGridScanRow;
+        const rows: Merged[] = [];
+
+        for (const grid of grids) {
+          const res = await fetchWithBQ(`/organizations/ranking-grids/${grid.public_id}/scans/`);
+          if (res.error) return { error: res.error };
+
+          const raw = res.data as ScanOut[] | { data?: ScanOut[] } | undefined;
+          const list: ScanOut[] = Array.isArray(raw)
+            ? raw
+            : raw && typeof raw === 'object' && 'data' in raw && Array.isArray(raw.data)
+              ? raw.data
+              : [];
+
+          for (const scan of list) {
+            rows.push({
+              ...scan,
+              grid_public_id: grid.public_id,
+              grid_size: grid.grid_size,
+              radius_km: grid.radius_km != null ? Number(grid.radius_km) : null,
+            });
+          }
+        }
+
+        rows.sort((a, b) => {
+          const ta = new Date(a.summary?.scan_date ?? a.created_at).getTime();
+          const tb = new Date(b.summary?.scan_date ?? b.created_at).getTime();
+          if (tb !== ta) return tb - ta;
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        });
+
+        return { data: rows };
+      },
+      providesTags: ['RankingGrid'],
+    }),
+
+    getRankingGridScanDetail: builder.query<
+      import('@/types/rankingGrid').RankingGridScanDetailOut,
+      { gridPublicId: string; scanPublicId: string }
+    >({
+      query: ({ gridPublicId, scanPublicId }) =>
+        `/organizations/ranking-grids/${gridPublicId}/scans/${scanPublicId}/`,
+      transformResponse: (
+        response:
+          | import('@/types/rankingGrid').RankingGridScanDetailOut
+          | { data?: import('@/types/rankingGrid').RankingGridScanDetailOut }
+      ) =>
+        response && typeof response === 'object' && 'data' in response && response.data != null
+          ? response.data
+          : (response as import('@/types/rankingGrid').RankingGridScanDetailOut),
+      providesTags: ['RankingGrid'],
+    }),
+
     // ── GBP Performance ───────────────────────────────────────────────────────
 
     getGBPPerformanceMetrics: builder.query<
@@ -670,6 +785,7 @@ export const {
   useExchangeTokenMutation,
   useCreateOrganizationMutation,
   useGetLocationsQuery,
+  useGetLocationContextQuery,
   useCreateLocationMutation,
   useGetGBPDashboardOverviewQuery,
   useGetGBPReviewsQuery,
@@ -685,6 +801,12 @@ export const {
   useRunCategoryFixerMutation,
   useGetGBPSERPRankingsQuery,
   useGetGBPCompetitorKeywordRanksQuery,
+  useGetRankingGridsQuery,
+  useCreateRankingGridMutation,
+  useTriggerRankingGridScanMutation,
+  useGetRankingGridScansQuery,
+  useGetMergedRankingGridScansForKeywordQuery,
+  useGetRankingGridScanDetailQuery,
   useGetGBPPerformanceMetricsQuery,
   useGetGBPPerformanceCompareQuery,
   useGetGBPPerformanceKeywordsQuery,

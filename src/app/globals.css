@@ -444,3 +444,9 @@
     font-weight: 600;
   }
 }
+
+/* Ranking grid map: hide default Leaflet icon styling for custom circle markers */
+.ranking-grid-marker.leaflet-marker-icon {
+  background: none !important;
+  border: none !important;
+}
