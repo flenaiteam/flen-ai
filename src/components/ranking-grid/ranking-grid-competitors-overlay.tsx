@@ -235,7 +235,7 @@ export function RankingGridCompetitorsOverlay({
                   <div className="flex flex-wrap gap-1 pt-0.5">
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant="base-ghost"
                       size="sm"
                       className="h-7 gap-1 px-2 text-[11px] text-amber-200 hover:bg-amber-500/15 hover:text-amber-50"
                       onPointerDown={(e) => e.stopPropagation()}
@@ -249,7 +249,7 @@ export function RankingGridCompetitorsOverlay({
                     </Button>
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant="base-ghost"
                       size="sm"
                       className="h-7 gap-1 px-2 text-[11px] text-amber-200 hover:bg-amber-500/15 hover:text-amber-50"
                       asChild
@@ -279,7 +279,7 @@ export function RankingGridCompetitorsOverlay({
         </div>
         <Button
           type="button"
-          variant="ghost"
+          variant="base-ghost"
           size="icon"
           className="mt-0.5 h-8 w-8 shrink-0 text-zinc-400 hover:bg-zinc-800/80 hover:text-zinc-100"
           aria-label={minimized ? 'Expand competitors list' : 'Minimize competitors list'}
