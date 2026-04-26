@@ -136,7 +136,7 @@ export function RunNewScanModal({
         <div className="mt-4 flex justify-end gap-2">
           <Button
             type="button"
-            variant="ghost"
+            variant="base-ghost"
             onClick={() => onOpenChange(false)}
             disabled={isRunning}
             className="text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
