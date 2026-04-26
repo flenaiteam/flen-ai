@@ -35,9 +35,9 @@ function Tabs({
 
   const activeValue = isControlled ? (value !== undefined ? String(value) : undefined) : uncontrolledValue
 
-  const handleValueChange = (v: any) => {
+  const handleValueChange = (v: any, event: any) => {
     if (!isControlled) setUncontrolledValue(v !== undefined ? String(v) : undefined)
-    onValueChange?.(v)
+    onValueChange?.(v, event)
   }
 
   return (
