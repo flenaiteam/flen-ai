@@ -87,6 +87,33 @@ export interface GBPMetricCompareResponse {
   change_percent: number;
 }
 
+export type GBPTimeSeriesGranularity = 'day' | 'week' | 'month';
+
+export interface GBPReviewTimeSeriesPoint {
+  period_start: string;
+  review_count: number;
+  avg_rating: number | null;
+  replied_count: number;
+  reply_rate_pct: number;
+  positive_count: number;
+  neutral_count: number;
+  negative_count: number;
+}
+
+export interface GBPReviewTimeSeriesResponse {
+  data: GBPReviewTimeSeriesPoint[];
+  meta_data: {
+    granularity: GBPTimeSeriesGranularity;
+    date_from: string;
+    date_to: string;
+    filters: {
+      rating: number | null;
+      replied: boolean | null;
+      search: string | null;
+    };
+  };
+}
+
 export interface GBPSearchKeyword {
   id: number;
   year: number;
@@ -292,6 +319,31 @@ const baseApi = createApi({
             .map(([k, v]) => [k, String(v)])
         ).toString();
         return `/organizations/locations/${locationPublicId}/gbp/reviews${qs ? `?${qs}` : ''}`;
+      },
+      providesTags: ['GBP'],
+    }),
+
+    getGBPReviewTimeseries: builder.query<
+      GBPReviewTimeSeriesResponse,
+      {
+        locationPublicId: string;
+        date_from?: string;
+        date_to?: string;
+        granularity?: GBPTimeSeriesGranularity;
+        search?: string;
+        rating?: number;
+        replied?: boolean;
+      }
+    >({
+      query: ({ locationPublicId, ...filters }) => {
+        const params = new URLSearchParams();
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, value.toString());
+          }
+        });
+        const queryString = params.toString();
+        return `/organizations/locations/${locationPublicId}/gbp/reviews/timeseries/${queryString ? `?${queryString}` : ''}`;
       },
       providesTags: ['GBP'],
     }),
@@ -555,6 +607,7 @@ export const {
   useCreateLocationMutation,
   useGetGBPDashboardOverviewQuery,
   useGetGBPReviewsQuery,
+  useGetGBPReviewTimeseriesQuery,
   useGetGBPPostsQuery,
   useGetGBPKeywordsQuery,
   useGetGBPProfileInfoQuery,

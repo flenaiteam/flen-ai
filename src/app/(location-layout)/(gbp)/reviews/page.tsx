@@ -1,6 +1,12 @@
+"use client";
+
 import { useMemo } from "react";
+import { useSelector } from "react-redux";
+import { GBPReviewTrends } from "@/components/gbp/gbp-review-trends";
+import { NeedsAttentionTable } from "@/components/gbp/needs-attention-table";
 import { ReviewsInboxTable } from "@/components/gbp/reviews-inbox-table";
 import { StatCard } from "@/components/ui/stat-card";
+import type { RootState } from "@/lib/redux/store";
 
 function toneFromScore(score: number): "success" | "warning" | "error" {
   if (score >= 80) return "success";
@@ -9,6 +15,8 @@ function toneFromScore(score: number): "success" | "warning" | "error" {
 }
 
 export default function ReviewsPage() {
+  const { current: currentLocation } = useSelector((state: RootState) => state.locations);
+
   const summary = {
     averageRating: 4.4,
     totalReviews: 248,
@@ -149,6 +157,8 @@ export default function ReviewsPage() {
           />
         ))}
       </div>
+      <GBPReviewTrends locationPublicId={currentLocation?.public_id} />
+      <NeedsAttentionTable />
       <ReviewsInboxTable />
     </div>
   );
