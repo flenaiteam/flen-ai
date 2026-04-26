@@ -23,7 +23,7 @@ import type { User } from '@/lib/redux/slices/authSlice';
 import type { Organization, Membership } from '@/lib/redux/slices/organizationsSlice';
 import { useStytchRefresh } from '@/hooks/use-stytch-refresh';
 
-const SESSION_DURATION_MINUTES = 60;
+const SESSION_DURATION_MINUTES = 7 * 24 * 60; // 7 days
 
 interface AppAuthContextType {
   isInitialized: boolean;

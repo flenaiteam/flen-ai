@@ -6,6 +6,7 @@
 type RefreshFn = (options?: { allowHardLogout?: boolean }) => Promise<boolean>;
 
 let refreshFn: RefreshFn | null = null;
+let ongoingRefresh: Promise<boolean> | null = null;
 
 export function registerStytchSessionRefresh(fn: RefreshFn | null): void {
   refreshFn = fn;
@@ -18,9 +19,19 @@ export function registerStytchSessionRefresh(fn: RefreshFn | null): void {
  */
 export async function tryStytchSessionRefresh(): Promise<boolean> {
   if (!refreshFn || typeof window === 'undefined') return false;
-  try {
-    return await refreshFn({ allowHardLogout: false });
-  } catch {
-    return false;
-  }
+
+  // Reuse one in-flight refresh so parallel 401s do not force logout.
+  if (ongoingRefresh) return ongoingRefresh;
+
+  ongoingRefresh = (async () => {
+    try {
+      return await refreshFn?.({ allowHardLogout: false }) ?? false;
+    } catch {
+      return false;
+    } finally {
+      ongoingRefresh = null;
+    }
+  })();
+
+  return ongoingRefresh;
 }

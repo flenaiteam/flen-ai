@@ -7,7 +7,8 @@ import { setSessionJwt } from '@/lib/redux/slices/authSlice';
 import { registerStytchSessionRefresh } from '@/lib/auth/sessionRefreshBridge';
 
 const REFRESH_INTERVAL_MS = 4 * 60 * 1000; // 4 min (JWT expires at 5 min)
-const SESSION_DURATION_MINUTES = 60;
+const SESSION_DURATION_MINUTES = 7 * 24 * 60; // 7 days
+const STYTCH_SESSION_COOKIE_KEY = 'stytch_session';
 
 /**
  * Handles Stytch session token refresh.
@@ -42,21 +43,62 @@ export function useStytchRefresh() {
             ? localStorage.getItem('stytch_session_token')
             : null;
 
+        const hasStytchSessionCookie =
+          typeof document !== 'undefined' &&
+          document.cookie.split(';').some((c) => c.trim().startsWith(`${STYTCH_SESSION_COOKIE_KEY}=`));
+
+        // If neither JWT nor cookie is available, there is nothing to refresh.
+        if (!storedJwt && !hasStytchSessionCookie) {
+          return false;
+        }
+
+        // Avoid noisy fetch errors when offline; next visibility/interval tick will retry.
+        if (typeof navigator !== 'undefined' && !navigator.onLine) {
+          return false;
+        }
+
         const response = await stytch.session.authenticate({
           session_duration_minutes: SESSION_DURATION_MINUTES,
           ...(storedJwt ? { session_jwt: storedJwt } : {}),
         });
 
         if (response.session_jwt) {
-          localStorage.setItem('stytch_session_token', response.session_jwt);
-          dispatch(setSessionJwt(response.session_jwt));
+          let sessionTokenToUse = response.session_jwt;
+
+          // If backend uses its own JWTs, exchange refreshed Stytch JWT for a backend JWT.
+          const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
+          try {
+            const backendRes = await fetch(`${backendBaseUrl}/api/v1/auth/refresh/`, {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${response.session_jwt}`,
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true',
+              },
+            });
+
+            if (backendRes.ok) {
+              const payload = (await backendRes.json()) as
+                | { session_jwt?: string; data?: { session_jwt?: string } }
+                | undefined;
+              const refreshedBackendJwt = payload?.session_jwt ?? payload?.data?.session_jwt;
+              if (refreshedBackendJwt) {
+                sessionTokenToUse = refreshedBackendJwt;
+              }
+            }
+          } catch {
+            // Non-fatal: keep using the Stytch-issued JWT.
+          }
+
+          localStorage.setItem('stytch_session_token', sessionTokenToUse);
+          dispatch(setSessionJwt(sessionTokenToUse));
 
           // Update auth_data cookie so middleware stays valid
           const authRaw = localStorage.getItem('auth_data');
           if (authRaw) {
             try {
               const authData = JSON.parse(authRaw);
-              authData.session_jwt = response.session_jwt;
+              authData.session_jwt = sessionTokenToUse;
               const updated = JSON.stringify(authData);
               localStorage.setItem('auth_data', updated);
               document.cookie = `auth_session=${encodeURIComponent(updated)}; path=/; max-age=${SESSION_DURATION_MINUTES * 60}; SameSite=Lax`;

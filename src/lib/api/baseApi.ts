@@ -275,7 +275,15 @@ const baseApi = createApi({
 
     getGBPReviews: builder.query<
       unknown,
-      { locationPublicId: string; page?: number; page_size?: number }
+      {
+        locationPublicId: string;
+        page?: number;
+        page_size?: number;
+        search?: string;
+        rating?: number;
+        replied?: boolean;
+        sort?: string;
+      }
     >({
       query: ({ locationPublicId, ...params }) => {
         const qs = new URLSearchParams(
@@ -322,6 +330,138 @@ const baseApi = createApi({
       query: (locationPublicId) =>
         `/organizations/locations/${locationPublicId}/gbp/profile-info/`,
       providesTags: ['GBP'],
+    }),
+
+    fixBusinessAbout: builder.mutation<
+      {
+        success: boolean;
+        description_option_1: string | null;
+        description_option_2: string | null;
+        description_option_3: string | null;
+        recommended_index: number | null;
+        recommendation_why: string | null;
+        confidence_score: number | null;
+      },
+      { locationPublicId: string; current_description?: string }
+    >({
+      query: ({ locationPublicId, current_description }) => ({
+        url: `/organizations/locations/${locationPublicId}/gbp/ai/fix-business-about/`,
+        method: 'POST',
+        body: current_description != null ? { current_description } : {},
+      }),
+      transformResponse: (response: {
+        data?: {
+          success?: boolean;
+          description_option_1?: string | null;
+          description_option_2?: string | null;
+          description_option_3?: string | null;
+          recommended_index?: number | null;
+          recommendation_why?: string | null;
+          confidence_score?: number | null;
+        };
+      }) => {
+        const d = response?.data;
+        return {
+          success: d?.success ?? true,
+          description_option_1: d?.description_option_1 ?? null,
+          description_option_2: d?.description_option_2 ?? null,
+          description_option_3: d?.description_option_3 ?? null,
+          recommended_index: d?.recommended_index ?? null,
+          recommendation_why: d?.recommendation_why ?? null,
+          confidence_score: d?.confidence_score ?? null,
+        };
+      },
+    }),
+
+    getGBPReviewReplyOptions: builder.mutation<
+      {
+        success: boolean;
+        reply_option_1_type: string | null;
+        reply_option_1: string | null;
+        reply_option_2_type: string | null;
+        reply_option_2: string | null;
+        reply_option_3_type: string | null;
+        reply_option_3: string | null;
+        recommended_index: number | null;
+        recommendation_why: string | null;
+        confidence_score: number | null;
+      },
+      { locationPublicId: string; review_text: string; reviewer_name?: string; star_rating?: number }
+    >({
+      query: ({ locationPublicId, review_text, reviewer_name, star_rating }) => ({
+        url: `/organizations/locations/${locationPublicId}/gbp/ai/review-reply/`,
+        method: "POST",
+        body: { review_text, reviewer_name, star_rating },
+        timeout: 120000,
+        // Use 'text' so we own JSON parsing and never hit a PARSING_ERROR
+        // even when the response uses chunked encoding or non-standard content headers.
+        responseHandler: "text" as const,
+      }),
+      transformResponse: (rawText: string) => {
+        type ReplyData = {
+          success?: boolean;
+          reply_option_1_type?: string | null;
+          reply_option_1?: string | null;
+          reply_option_2_type?: string | null;
+          reply_option_2?: string | null;
+          reply_option_3_type?: string | null;
+          reply_option_3?: string | null;
+          recommended_index?: number | null;
+          recommendation_why?: string | null;
+          confidence_score?: number | null;
+        };
+        let parsed: { data?: ReplyData } & ReplyData = {};
+        try {
+          parsed = JSON.parse(rawText) as typeof parsed;
+        } catch {
+          // Non-JSON body → return safe all-null result so .unwrap() resolves (not throws)
+        }
+        const d: ReplyData = (parsed?.data ?? parsed) as ReplyData;
+        return {
+          success: (d?.success ?? true) as boolean,
+          reply_option_1_type: (d?.reply_option_1_type ?? null) as string | null,
+          reply_option_1: (d?.reply_option_1 ?? null) as string | null,
+          reply_option_2_type: (d?.reply_option_2_type ?? null) as string | null,
+          reply_option_2: (d?.reply_option_2 ?? null) as string | null,
+          reply_option_3_type: (d?.reply_option_3_type ?? null) as string | null,
+          reply_option_3: (d?.reply_option_3 ?? null) as string | null,
+          recommended_index: (d?.recommended_index ?? null) as number | null,
+          recommendation_why: (d?.recommendation_why ?? null) as string | null,
+          confidence_score: (d?.confidence_score ?? null) as number | null,
+        };
+      },
+    }),
+
+    runGBPHoursOptimizer: builder.mutation<unknown, string>({
+      query: (locationPublicId) => ({
+        url: `/organizations/locations/${locationPublicId}/gbp/hours-optimizer/`,
+        method: 'POST',
+      }),
+      transformResponse: (response: { data?: unknown } | unknown) =>
+        (response as { data?: unknown })?.data ?? response,
+    }),
+
+    syncGBPProfileInfo: builder.mutation<
+      { status?: string; job_id?: string; estimated_seconds?: number; message?: string },
+      string
+    >({
+      query: (locationPublicId) => ({
+        url: `/organizations/locations/${locationPublicId}/gbp/profile-info/sync/`,
+        method: 'POST',
+      }),
+      transformResponse: (response: {
+        data?: { status?: string; job_id?: string; estimated_seconds?: number; message?: string };
+      }) => response?.data ?? {},
+      invalidatesTags: ['GBP'],
+    }),
+
+    runCategoryFixer: builder.mutation<unknown, { locationPublicId: string }>({
+      query: ({ locationPublicId }) => ({
+        url: `/organizations/locations/${locationPublicId}/category-fixer/`,
+        method: 'POST',
+      }),
+      transformResponse: (response: { data?: unknown } | unknown) =>
+        (response as { data?: unknown })?.data ?? response,
     }),
 
     getGBPSERPRankings: builder.query<
@@ -418,6 +558,11 @@ export const {
   useGetGBPPostsQuery,
   useGetGBPKeywordsQuery,
   useGetGBPProfileInfoQuery,
+  useFixBusinessAboutMutation,
+  useGetGBPReviewReplyOptionsMutation,
+  useRunGBPHoursOptimizerMutation,
+  useSyncGBPProfileInfoMutation,
+  useRunCategoryFixerMutation,
   useGetGBPSERPRankingsQuery,
   useGetGBPCompetitorKeywordRanksQuery,
   useGetGBPPerformanceMetricsQuery,

@@ -6,7 +6,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 interface StatCardProps {
   label: string;
-  value: string | number;
+  value: React.ReactNode;
+  subValue?: React.ReactNode;
+  footer?: React.ReactNode;
   trend?: "up" | "down" | "neutral";
   trendValue?: string;
   icon?: React.ReactNode;
@@ -14,11 +16,16 @@ interface StatCardProps {
   badgeLabel?: string;
   badgeVariant?: React.ComponentProps<typeof Badge>["variant"];
   className?: string;
+  valueClassName?: string;
+  subValueClassName?: string;
+  footerClassName?: string;
 }
 
 export function StatCard({
   label,
   value,
+  subValue,
+  footer,
   trend,
   trendValue,
   icon,
@@ -26,6 +33,9 @@ export function StatCard({
   badgeLabel,
   badgeVariant = "default",
   className,
+  valueClassName,
+  subValueClassName,
+  footerClassName,
 }: StatCardProps) {
   return (
     <div className={cn("rounded-lg border border-[var(--border-default)]  p-6", className)}>
@@ -54,7 +64,12 @@ export function StatCard({
           {icon && <span className="text-[var(--text-muted)]">{icon}</span>}
         </div>
       </div>
-      <p className="mt-2 font-display text-3xl font-bold text-[var(--text-primary)]">{value}</p>
+      <p className={cn("mt-2 font-display text-3xl font-bold text-[var(--text-primary)]", valueClassName)}>{value}</p>
+      {subValue ? (
+        <div className={cn("mt-1 text-sm text-[var(--text-secondary)]", subValueClassName)}>
+          {subValue}
+        </div>
+      ) : null}
       {trend && trendValue && (
         <div className={cn("mt-2 flex items-center gap-1 text-xs font-medium",
           trend === "up" && "text-success-600",
@@ -67,6 +82,11 @@ export function StatCard({
           <span>{trendValue}</span>
         </div>
       )}
+      {footer ? (
+        <div className={cn("mt-2 text-sm text-[var(--text-secondary)]", footerClassName)}>
+          {footer}
+        </div>
+      ) : null}
     </div>
   );
 }

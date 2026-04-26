@@ -62,7 +62,7 @@ function persistAuth(data: AuthResponse) {
   };
   localStorage.setItem('stytch_session_token', data.session_jwt);
   localStorage.setItem('auth_data', JSON.stringify(payload));
-  const maxAge = 60 * 60; // 60 min
+  const maxAge = 7 * 24 * 60 * 60; // 7 days
   document.cookie = `auth_session=${encodeURIComponent(JSON.stringify(payload))}; path=/; max-age=${maxAge}; SameSite=Lax`;
 }
 
