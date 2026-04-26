@@ -1,5 +1,11 @@
+"use client";
+
 import { useMemo } from "react";
+import { useSelector } from "react-redux";
+import { GBPPostsSections } from "@/components/gbp/gbp-posts-sections";
+import { GBPPostTrends } from "@/components/gbp/gbp-post-trends";
 import { StatCard } from "@/components/ui/stat-card";
+import type { RootState } from "@/lib/redux/store";
 
 function toneFromScore(score: number): "success" | "warning" | "error" {
   if (score >= 80) return "success";
@@ -8,6 +14,7 @@ function toneFromScore(score: number): "success" | "warning" | "error" {
 }
 
 export default function PostsPage() {
+  const { current: currentLocation } = useSelector((state: RootState) => state.locations);
   const summary = {
     totalPosts: 62,
     postsLast30Days: 12,
@@ -120,6 +127,8 @@ export default function PostsPage() {
           />
         ))}
       </div>
+      <GBPPostTrends locationPublicId={currentLocation?.public_id} />
+      <GBPPostsSections locationPublicId={currentLocation?.public_id} />
     </div>
   );
 }

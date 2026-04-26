@@ -114,6 +114,33 @@ export interface GBPReviewTimeSeriesResponse {
   };
 }
 
+export interface GBPPostTimeSeriesPoint {
+  period_start: string;
+  post_count: number;
+  with_media_count: number;
+  with_media_pct: number;
+  with_cta_count: number;
+  with_cta_pct: number;
+  offer_count: number;
+  event_count: number;
+  update_count: number;
+  whats_new_count: number;
+  other_count: number;
+}
+
+export interface GBPPostTimeSeriesResponse {
+  data: GBPPostTimeSeriesPoint[];
+  meta_data: {
+    granularity: GBPTimeSeriesGranularity;
+    date_from: string;
+    date_to: string;
+    filters: {
+      post_type: string | null;
+      search: string | null;
+    };
+  };
+}
+
 export interface GBPSearchKeyword {
   id: number;
   year: number;
@@ -350,7 +377,14 @@ const baseApi = createApi({
 
     getGBPPosts: builder.query<
       unknown,
-      { locationPublicId: string; page?: number; page_size?: number }
+      {
+        locationPublicId: string;
+        page?: number;
+        page_size?: number;
+        search?: string;
+        post_type?: string;
+        sort?: string;
+      }
     >({
       query: ({ locationPublicId, ...params }) => {
         const qs = new URLSearchParams(
@@ -359,6 +393,30 @@ const baseApi = createApi({
             .map(([k, v]) => [k, String(v)])
         ).toString();
         return `/organizations/locations/${locationPublicId}/gbp/posts/${qs ? `?${qs}` : ''}`;
+      },
+      providesTags: ['GBP'],
+    }),
+
+    getGBPPostTimeseries: builder.query<
+      GBPPostTimeSeriesResponse,
+      {
+        locationPublicId: string;
+        date_from?: string;
+        date_to?: string;
+        granularity?: GBPTimeSeriesGranularity;
+        search?: string;
+        post_type?: string;
+      }
+    >({
+      query: ({ locationPublicId, ...filters }) => {
+        const params = new URLSearchParams();
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, value.toString());
+          }
+        });
+        const queryString = params.toString();
+        return `/organizations/locations/${locationPublicId}/gbp/posts/timeseries/${queryString ? `?${queryString}` : ''}`;
       },
       providesTags: ['GBP'],
     }),
@@ -609,6 +667,7 @@ export const {
   useGetGBPReviewsQuery,
   useGetGBPReviewTimeseriesQuery,
   useGetGBPPostsQuery,
+  useGetGBPPostTimeseriesQuery,
   useGetGBPKeywordsQuery,
   useGetGBPProfileInfoQuery,
   useFixBusinessAboutMutation,
