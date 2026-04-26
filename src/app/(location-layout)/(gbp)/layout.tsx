@@ -63,7 +63,6 @@ import { setCurrentLocation, setLocationsList } from "@/lib/redux/slices/locatio
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/lib/redux/store";
 import { cn } from "@/lib/utils";
-import { ConfirmAlertDialog } from "@/components/ui/confirm-alert-dialog";
 
 const ADD_LOCATION_VALUE = "__add_location__";
 
@@ -91,7 +90,6 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [syncing, setSyncing] = useState(false);
-  const [signOutOpen, setSignOutOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
@@ -369,7 +367,7 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
                 <DropdownMenuGroup>
                   <DropdownMenuItem
                     variant="destructive"
-                    onSelect={() => setSignOutOpen(true)}
+                    onClick={() => logout()}
                     className="cursor-pointer"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
@@ -378,14 +376,6 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
-            <ConfirmAlertDialog
-              open={signOutOpen}
-              onOpenChange={setSignOutOpen}
-              title="Sign out?"
-              description="You'll need to sign in again to access your dashboard and locations."
-              confirmLabel="Sign out"
-              onConfirm={logout}
-            />
           </div>
         </header>
 
