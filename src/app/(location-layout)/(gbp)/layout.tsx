@@ -68,7 +68,7 @@ const ADD_LOCATION_VALUE = "__add_location__";
 
 const GBP_SECTIONS = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
-  { id: "overview", label: "Overview", icon: LayoutGrid, href: "/overview" },
+  // { id: "overview", label: "Overview", icon: LayoutGrid, href: "/overview" },
   { id: "profile", label: "Profile", icon: Building2, href: "/profile" },
   { id: "reviews", label: "Reviews", icon: MessageSquare, href: "/reviews" },
   { id: "posts", label: "Posts", icon: FileText, href: "/posts" },

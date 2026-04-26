@@ -423,7 +423,15 @@ const baseApi = createApi({
 
     getGBPKeywords: builder.query<
       unknown,
-      { locationPublicId: string; page?: number; page_size?: number }
+      {
+        locationPublicId: string;
+        page?: number;
+        page_size?: number;
+        search?: string;
+        competition?: string;
+        is_active?: boolean;
+        sort?: string;
+      }
     >({
       query: ({ locationPublicId, ...params }) => {
         const qs = new URLSearchParams(
