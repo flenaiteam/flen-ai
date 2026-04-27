@@ -10,3 +10,9 @@ export const chartSurface = {
   postAccent: "text-emerald-600",
   chartHeightLarge: 360,
 } as const;
+
+/** Shared button classes for Google Business Profile toolbars. */
+export const gbpButtonClasses = {
+  primaryCta: "gap-2 border border-primary/60 shadow-sm",
+  outlineCta: "gap-2 border-border/80 bg-background shadow-sm",
+} as const;

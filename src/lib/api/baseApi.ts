@@ -427,6 +427,54 @@ const baseApi = createApi({
       providesTags: ['GBP'],
     }),
 
+    generateGBPPost: builder.mutation<
+      import("@/types/gbp").GeneratePostBulkPayload,
+      {
+        locationPublicId: string;
+        post_for_day?: string;
+        post_index?: number;
+        start_date?: string;
+        end_date?: string;
+      }
+    >({
+      query: ({ locationPublicId, post_for_day, post_index, start_date, end_date }) => ({
+        url: `/organizations/locations/${locationPublicId}/gbp/ai/generate-post/`,
+        method: "POST",
+        body: { post_for_day, post_index, start_date, end_date },
+      }),
+      transformResponse: (response: {
+        data?: {
+          success?: boolean;
+          posts?: Array<{ keyword: string; post: unknown }>;
+          post?: unknown;
+          meta?: unknown;
+        };
+      }) => {
+        const payload = response?.data;
+        if (!payload) return { success: true as const, posts: [] };
+        if (Array.isArray(payload.posts) && payload.posts.length > 0) {
+          return {
+            success: true as const,
+            posts: payload.posts as import("@/types/gbp").GeneratePostBulkItem[],
+            meta: payload.meta as import("@/types/gbp").GeneratePostBulkPayload["meta"],
+          };
+        }
+        if (payload.post != null) {
+          return {
+            success: true as const,
+            posts: [
+              {
+                keyword: "",
+                post: payload.post as import("@/types/gbp").GBPPostAI,
+              },
+            ],
+            meta: payload.meta as import("@/types/gbp").GeneratePostBulkPayload["meta"],
+          };
+        }
+        return { success: true as const, posts: [] };
+      },
+    }),
+
     getGBPKeywords: builder.query<
       unknown,
       {
@@ -792,6 +840,7 @@ export const {
   useGetGBPReviewTimeseriesQuery,
   useGetGBPPostsQuery,
   useGetGBPPostTimeseriesQuery,
+  useGenerateGBPPostMutation,
   useGetGBPKeywordsQuery,
   useGetGBPProfileInfoQuery,
   useFixBusinessAboutMutation,
