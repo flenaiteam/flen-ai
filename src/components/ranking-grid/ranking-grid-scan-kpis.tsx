@@ -2,6 +2,7 @@
 
 import { useMemo, type ReactNode } from 'react';
 import { AlertCircle, CheckCircle2, Info, LayoutGrid, Minus } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import type { RankingGridScanDetailOut, RankingGridScanSummary } from '@/types/rankingGrid';
@@ -19,18 +20,18 @@ function KpiHint({ title, description }: { title: string; description: string })
   return (
     <Tooltip>
       <TooltipTrigger
-        className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600"
+        className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--text-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-strong)]"
         aria-label={`What is ${title}?`}
       >
         <Info className="h-3 w-3" />
       </TooltipTrigger>
       <TooltipContent
-        className="z-[1200] w-80 max-w-[22rem] border border-zinc-700 bg-zinc-950 p-4 text-zinc-100 shadow-xl"
+        className="z-[1200] w-80 max-w-[22rem] border border-[var(--border-default)] bg-[var(--bg-page)] p-4 text-[var(--text-primary)] shadow-xl"
         align="start"
         side="top"
       >
-        <p className="text-sm font-semibold text-zinc-50">{title}</p>
-        <p className="mt-2 text-xs leading-relaxed text-zinc-400">{description}</p>
+        <p className="text-sm font-semibold text-[var(--text-primary)]">{title}</p>
+        <p className="mt-2 text-xs leading-relaxed text-[var(--text-secondary)]">{description}</p>
       </TooltipContent>
     </Tooltip>
   );
@@ -39,34 +40,31 @@ function KpiHint({ title, description }: { title: string; description: string })
 function HealthStrip({ tone, label }: { tone: Health; label: string }) {
   if (tone === 'neutral') {
     return (
-      <span className="mt-1 inline-flex max-w-full items-center gap-1 text-[10px] font-medium text-zinc-500">
+      <Badge variant="default" className="mt-1 max-w-full items-center justify-start text-[10px] px-1.5 py-0 gap-1 font-medium min-w-0">
         <Minus className="h-3 w-3 shrink-0" aria-hidden />
-        <span className="truncate">{label}</span>
-      </span>
+        <span className="min-w-0 truncate">{label}</span>
+      </Badge>
     );
   }
+  const variant = tone === 'good' ? 'success' : tone === 'fair' ? 'warning' : 'error';
   return (
-    <span
-      className={cn(
-        'mt-1 inline-flex max-w-full items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold',
-        tone === 'good' && 'bg-emerald-950/70 text-emerald-200 ring-1 ring-emerald-800/60',
-        tone === 'fair' && 'bg-amber-950/60 text-amber-100 ring-1 ring-amber-800/50',
-        tone === 'poor' && 'bg-rose-950/65 text-rose-200 ring-1 ring-rose-800/55'
-      )}
+    <Badge
+      variant={variant}
+      className="mt-1 max-w-full items-center justify-start text-[10px] px-1.5 py-0 gap-1 font-semibold min-w-0"
     >
       {tone === 'good' ? (
         <CheckCircle2 className="h-3 w-3 shrink-0" aria-hidden />
       ) : (
         <AlertCircle className="h-3 w-3 shrink-0" aria-hidden />
       )}
-      <span className="truncate">{label}</span>
-    </span>
+      <span className="min-w-0 truncate">{label}</span>
+    </Badge>
   );
 }
 
 function DeltaBadge({ delta, lowerIsBetter = false }: { delta: number | null; lowerIsBetter?: boolean }) {
   if (delta == null || Math.abs(delta) < 0.05) {
-    return <span className="text-[10px] tabular-nums text-zinc-500">—</span>;
+    return <span className="text-[10px] tabular-nums text-[var(--text-muted)]">—</span>;
   }
   const improved = lowerIsBetter ? delta < 0 : delta > 0;
   const sign = delta > 0 ? '+' : '';
@@ -102,9 +100,9 @@ function GridKpiCell({
   lowerIsBetter?: boolean;
 }) {
   return (
-    <div className="min-w-0 bg-zinc-900/95 px-2 py-2 text-zinc-100 sm:px-2.5 sm:py-2">
+    <div className="min-w-0 bg-[var(--bg-surface)]/95 px-2 py-2 text-[var(--text-primary)] sm:px-2.5 sm:py-2">
       <div className="flex items-start justify-between gap-1">
-        <p className="line-clamp-2 text-[10px] font-medium leading-tight text-zinc-400">{label}</p>
+        <p className="line-clamp-2 text-[10px] font-medium leading-tight text-[var(--text-secondary)]">{label}</p>
         <KpiHint title={infoTitle} description={infoDescription} />
       </div>
       <div className="mt-0.5">{children}</div>
@@ -193,12 +191,12 @@ export function RankingGridScanKpis({ summary, points, previousSummary }: Rankin
         )
       : null;
 
-  const valueClass = 'text-xl font-bold tabular-nums leading-none tracking-tight text-zinc-50 sm:text-2xl';
+  const valueClass = 'text-xl font-bold tabular-nums leading-none tracking-tight text-[var(--text-primary)] sm:text-2xl';
 
   return (
     <div
       className={cn(
-        'grid min-w-0 grid-cols-3 gap-px overflow-x-auto overflow-y-hidden rounded-lg border border-zinc-700 bg-zinc-800',
+        'grid min-w-0 grid-cols-3 gap-px overflow-x-auto overflow-y-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-subtle)]',
         'sm:grid-cols-6'
       )}
       role="list"
@@ -328,7 +326,7 @@ export function RankingGridScanKpis({ summary, points, previousSummary }: Rankin
           tone="neutral"
           toneLabel="Loading..."
         >
-          <p className="text-xl font-bold tabular-nums text-zinc-500 sm:text-2xl">-</p>
+          <p className="text-xl font-bold tabular-nums text-[var(--text-muted)] sm:text-2xl">-</p>
         </GridKpiCell>
       )}
     </div>
@@ -348,7 +346,7 @@ export function RankingGridScanSetupRow({
     gridConfig?.radius_km != null ? (
       <>
         {gridConfig.radius_km} km
-        {gridConfig.radius_mi != null ? <span className="text-zinc-500"> ({gridConfig.radius_mi} mi)</span> : null}
+        {gridConfig.radius_mi != null ? <span className="text-[var(--text-muted)]"> ({gridConfig.radius_mi} mi)</span> : null}
       </>
     ) : (
       '-'
@@ -356,26 +354,26 @@ export function RankingGridScanSetupRow({
   const points = (gridConfig?.points_with_data ?? summary?.total_grid_points ?? pointsLength) || '-';
 
   return (
-    <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-zinc-400">
+    <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[var(--text-secondary)]">
       <span className="inline-flex shrink-0 items-center gap-1.5">
-        <LayoutGrid className="h-3.5 w-3.5 text-zinc-500" aria-hidden />
-        <span className="text-zinc-500">Setup</span>
-        <span className="font-medium text-zinc-200">{gridConfig?.grid_label ?? '-'}</span>
+        <LayoutGrid className="h-3.5 w-3.5 text-[var(--text-muted)]" aria-hidden />
+        <span className="text-[var(--text-muted)]">Setup</span>
+        <span className="font-medium text-[var(--text-secondary)]">{gridConfig?.grid_label ?? '-'}</span>
       </span>
-      <span className="text-zinc-600">·</span>
+      <span className="text-[var(--text-muted)]">·</span>
       <span className="shrink-0">
-        <span className="text-zinc-500">Radius </span>
-        <span className="font-medium text-zinc-200">{radius}</span>
+        <span className="text-[var(--text-muted)]">Radius </span>
+        <span className="font-medium text-[var(--text-secondary)]">{radius}</span>
       </span>
-      <span className="text-zinc-600">·</span>
+      <span className="text-[var(--text-muted)]">·</span>
       <span className="shrink-0">
-        <span className="text-zinc-500">Points </span>
-        <span className="font-medium text-zinc-200">{points}</span>
+        <span className="text-[var(--text-muted)]">Points </span>
+        <span className="font-medium text-[var(--text-secondary)]">{points}</span>
       </span>
-      <span className="text-zinc-600">·</span>
+      <span className="text-[var(--text-muted)]">·</span>
       <span className="shrink-0">
-        <span className="text-zinc-500">Keywords </span>
-        <span className="font-medium text-zinc-200">1</span>
+        <span className="text-[var(--text-muted)]">Keywords </span>
+        <span className="font-medium text-[var(--text-secondary)]">1</span>
       </span>
     </div>
   );
@@ -394,7 +392,7 @@ export function RankingGridMetricsStrip({
 }) {
   const showKpis = summary != null && summary.total_grid_points > 0;
   return (
-    <div className="shrink-0 border-b border-zinc-800 bg-zinc-950 px-3 py-2">
+    <div className="shrink-0 border-b border-[var(--border-default)] bg-[var(--bg-page)] px-3 py-2">
       <RankingGridScanSetupRow gridConfig={gridConfig} summary={summary} pointsLength={points.length} />
       {showKpis ? (
         <div className="mt-2 min-w-0">

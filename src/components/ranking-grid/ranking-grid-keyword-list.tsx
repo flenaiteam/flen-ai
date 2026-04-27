@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { CheckCircle, Clock, LayoutGrid, Search } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { RankingGridOut } from '@/types/rankingGrid';
 
@@ -41,10 +42,10 @@ export function RankingGridKeywordList({
   if (keywords.length === 0) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
-        <Search className="h-8 w-8 text-zinc-600" aria-hidden />
+        <Search className="h-8 w-8 text-[var(--text-muted)]" aria-hidden />
         <div>
-          <p className="text-sm font-medium text-zinc-400">No keywords yet</p>
-          <p className="mt-1 text-xs text-zinc-600">
+          <p className="text-sm font-medium text-[var(--text-secondary)]">No keywords yet</p>
+          <p className="mt-1 text-xs text-[var(--text-muted)]">
             Add keywords in the Keywords section to start tracking rankings.
           </p>
         </div>
@@ -54,8 +55,8 @@ export function RankingGridKeywordList({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="border-b border-zinc-800 px-4 py-2.5 h-[38px]">
-        <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-500 ">
+      <div className="border-b border-[var(--border-default)] px-4 py-2.5 h-[38px]">
+        <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--text-muted)] ">
           Keywords ({keywords.length})
         </p>
       </div>
@@ -70,31 +71,31 @@ export function RankingGridKeywordList({
               type="button"
               onClick={() => onSelectKeyword(kw.id)}
               className={cn(
-                'flex w-full items-center justify-between gap-3 border-b border-zinc-800/60 px-4 py-3 text-left transition-colors last:border-b-0',
+                'flex w-full items-center justify-between gap-3 border-b border-[var(--border-default)]/60 px-4 py-3 text-left transition-colors last:border-b-0',
                 isSelected
-                  ? 'bg-zinc-800/80 '
-                  : 'hover:bg-zinc-900/60'
+                  ? 'bg-[var(--bg-subtle)]/80 '
+                  : 'hover:bg-[var(--bg-surface)]/60'
               )}
             >
               <div className="min-w-0 flex-1">
-                <p className={cn('truncate text-sm font-medium', isSelected ? 'text-zinc-50' : 'text-zinc-200')}>
+                <p className={cn('truncate text-sm font-medium', isSelected ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]')}>
                   {kw.keyword}
                 </p>
-                <p className="mt-0.5 text-xs text-zinc-500">
+                <p className="mt-0.5 text-xs text-[var(--text-muted)]">
                   {formatNumber(kw.search_volume)}/mo
                 </p>
               </div>
               <div className="shrink-0">
                 {hasGrid ? (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-950/50 px-2 py-0.5 text-[10px] font-medium text-emerald-300 ring-1 ring-emerald-800/60">
+                  <Badge variant="success" className="text-[10px] px-2 py-0 shrink-0 gap-1 font-medium">
                     <CheckCircle className="h-3 w-3" aria-hidden />
                     Has grid
-                  </span>
+                  </Badge>
                 ) : (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-zinc-800/60 px-2 py-0.5 text-[10px] font-medium text-zinc-500">
+                  <Badge variant="warning" className="text-[10px] px-2 py-0 shrink-0 gap-1 font-medium">
                     <Clock className="h-3 w-3" aria-hidden />
                     No grid
-                  </span>
+                  </Badge>
                 )}
               </div>
             </button>
@@ -103,8 +104,8 @@ export function RankingGridKeywordList({
       </div>
 
       {/* Footer summary */}
-      <div className="shrink-0 border-t border-zinc-800 px-4 py-2">
-        <p className="flex items-center gap-1.5 text-[11px] text-zinc-500">
+      <div className="shrink-0 border-t border-[var(--border-default)] px-4 py-2">
+        <p className="flex items-center gap-1.5 text-[11px] text-[var(--text-muted)]">
           <LayoutGrid className="h-3.5 w-3.5" aria-hidden />
           {gridsMap.size} of {keywords.length} tracked
         </p>

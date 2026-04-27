@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown, Plus, TrendingDown, TrendingUp } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
@@ -23,32 +24,32 @@ function computeDelta(current: MergedRankingGridScanRow, previous: MergedRanking
 function DeltaChip({ kind, value }: { kind: DeltaKind; value: number | null | undefined }) {
   if (kind === 'first_scan') {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-blue-950/60 px-1.5 py-0.5 text-[10px] font-medium text-blue-300 ring-1 ring-blue-700/50">
-        <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+      <Badge variant="info" className="text-[10px] px-1.5 py-0 shrink-0 gap-1 font-medium">
+        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--soft-info-accent)]" aria-hidden />
         First
-      </span>
+      </Badge>
     );
   }
   if (kind === 'unchanged' || value == null) {
     return (
-      <span className="inline-flex items-center rounded-full bg-zinc-800/60 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400">
+      <Badge variant="default" className="text-[10px] px-1.5 py-0 shrink-0 font-medium tabular-nums">
         —
-      </span>
+      </Badge>
     );
   }
   if (kind === 'improved') {
     return (
-      <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-950/60 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-300 ring-1 ring-emerald-700/50">
+      <Badge variant="success" className="text-[10px] px-1.5 py-0 shrink-0 gap-0.5 font-semibold tabular-nums">
         <TrendingUp className="h-3 w-3" aria-hidden />
         {Math.abs(Number(value)).toFixed(1)}
-      </span>
+      </Badge>
     );
   }
   return (
-    <span className="inline-flex items-center gap-0.5 rounded-full bg-rose-950/60 px-1.5 py-0.5 text-[10px] font-semibold text-rose-300 ring-1 ring-rose-700/50">
+    <Badge variant="error" className="text-[10px] px-1.5 py-0 shrink-0 gap-0.5 font-semibold tabular-nums">
       <TrendingDown className="h-3 w-3" aria-hidden />
       {Math.abs(Number(value)).toFixed(1)}
-    </span>
+    </Badge>
   );
 }
 
@@ -97,11 +98,11 @@ export function RankingGridScanSelector({
 
   return (
     <div className="flex flex-col gap-1">
-      <Label className={cn('text-xs text-zinc-400', labelClassName)}>Scan</Label>
+      <Label className={cn('text-xs text-[var(--text-secondary)]', labelClassName)}>Scan</Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           className={cn(
-            'inline-flex h-9 w-[min(100%,340px)] max-w-full items-center justify-between gap-2 rounded-md border border-zinc-700 bg-zinc-900 px-3 text-sm font-normal text-zinc-100 hover:bg-zinc-800 hover:text-zinc-100',
+            'inline-flex h-9 w-[min(100%,340px)] max-w-full items-center justify-between gap-2 rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-sm font-normal text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]',
             triggerClassName
           )}
         >
@@ -110,14 +111,14 @@ export function RankingGridScanSelector({
         </PopoverTrigger>
         <PopoverContent
           align="start"
-          className="w-[min(480px,calc(100vw-2rem))] border-zinc-700 bg-zinc-950 p-0 text-zinc-100 shadow-xl"
+          className="w-[min(480px,calc(100vw-2rem))] border-[var(--border-default)] bg-[var(--bg-page)] p-0 text-[var(--text-primary)] shadow-xl"
         >
-          <div className="border-b border-zinc-800 px-3 py-2">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-500">Scan history</p>
+          <div className="border-b border-[var(--border-default)] px-3 py-2">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--text-muted)]">Scan history</p>
           </div>
           <div className="max-h-[min(320px,50vh)] overflow-y-auto">
             {scans.length === 0 ? (
-              <div className="py-8 text-center text-sm text-zinc-500">No scans yet.</div>
+              <div className="py-8 text-center text-sm text-[var(--text-muted)]">No scans yet.</div>
             ) : (
               scans.map((scan, idx) => {
                 const isSelected = scan.public_id === (selectedScan?.public_id ?? null);
@@ -133,8 +134,8 @@ export function RankingGridScanSelector({
                     key={scan.public_id}
                     type="button"
                     className={cn(
-                      'flex w-full items-center justify-between gap-3 border-b border-zinc-800/60 px-3 py-2.5 text-left last:border-b-0',
-                      isSelected ? 'bg-zinc-800/60' : 'hover:bg-zinc-900/80'
+                      'flex w-full items-center justify-between gap-3 border-b border-[var(--border-default)]/60 px-3 py-2.5 text-left last:border-b-0',
+                      isSelected ? 'bg-[var(--bg-subtle)]/60' : 'hover:bg-[var(--bg-surface)]/80'
                     )}
                     onClick={() => {
                       onSelectScan(scan.public_id);
@@ -142,16 +143,16 @@ export function RankingGridScanSelector({
                     }}
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-zinc-100">{formatScanDate(scan)}</p>
-                      <p className="mt-0.5 truncate text-[11px] text-zinc-400">{formatScanConfig(scan)}</p>
+                      <p className="truncate text-sm font-medium text-[var(--text-primary)]">{formatScanDate(scan)}</p>
+                      <p className="mt-0.5 truncate text-[11px] text-[var(--text-secondary)]">{formatScanConfig(scan)}</p>
                     </div>
                     <div className="flex shrink-0 flex-col items-end gap-1">
                       {scan.summary?.avg_rank != null ? (
-                        <span className="text-sm font-semibold tabular-nums text-zinc-200">
+                        <span className="text-sm font-semibold tabular-nums text-[var(--text-secondary)]">
                           #{Number(scan.summary.avg_rank).toFixed(1)}
                         </span>
                       ) : (
-                        <span className="text-sm tabular-nums text-zinc-500">—</span>
+                        <span className="text-sm tabular-nums text-[var(--text-muted)]">—</span>
                       )}
                       <DeltaChip kind={deltaKind} value={deltaValue} />
                     </div>
@@ -160,10 +161,10 @@ export function RankingGridScanSelector({
               })
             )}
           </div>
-          <div className="border-t border-zinc-800">
+          <div className="border-t border-[var(--border-default)]">
             <button
               type="button"
-              className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100"
+              className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)]"
               onClick={() => {
                 setOpen(false);
                 onRunNewScan();

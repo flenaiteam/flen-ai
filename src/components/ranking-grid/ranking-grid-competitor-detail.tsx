@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { ExternalLink } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { RankingGridListingOut } from '@/types/rankingGrid';
 
@@ -48,9 +49,9 @@ export function RankingGridCompetitorDetail({
           {listing.address ? <div className="text-xs leading-snug text-slate-400">{listing.address}</div> : null}
         </div>
         {listing.is_own_business ? (
-          <span className="shrink-0 rounded-full bg-primary/20 px-2 py-0.5 text-[10px] text-primary">
+          <Badge variant="brand" className="shrink-0 text-[10px] px-2 py-0">
             Your business
-          </span>
+          </Badge>
         ) : null}
       </div>
 

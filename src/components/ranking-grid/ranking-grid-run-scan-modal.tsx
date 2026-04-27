@@ -29,19 +29,19 @@ function SegmentedControl<T extends number>({
   formatLabel: (v: T) => string;
 }) {
   return (
-    <div className="inline-flex w-full overflow-hidden rounded-md border border-zinc-700">
+    <div className="inline-flex w-full overflow-hidden rounded-md border border-[var(--border-default)]">
       {options.map((opt, i) => (
         <button
           key={opt}
           type="button"
           onClick={() => onChange(opt)}
           className={cn(
-            'flex-1 border-r border-zinc-700 px-3 py-2 text-sm font-medium transition-colors last:border-r-0',
+            'flex-1 border-r border-[var(--border-default)] px-3 py-2 text-sm font-medium transition-colors last:border-r-0',
             i === 0 && 'rounded-l-[5px]',
             i === options.length - 1 && 'rounded-r-[5px]',
             value === opt
               ? 'bg-primary text-primary-foreground'
-              : 'bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100'
+              : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]'
           )}
         >
           {formatLabel(opt)}
@@ -77,12 +77,12 @@ export function RunNewScanModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md border-zinc-800 bg-zinc-950 text-zinc-100 shadow-2xl">
+      <DialogContent className="max-w-md border-[var(--border-default)] bg-[var(--bg-page)] text-[var(--text-primary)] shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="text-base font-semibold text-zinc-50">Run new scan</DialogTitle>
+          <DialogTitle className="text-base font-semibold text-[var(--text-primary)]">Run new scan</DialogTitle>
           {keywordText ? (
-            <p className="mt-0.5 truncate text-sm text-zinc-400">
-              Keyword: <span className="font-medium text-zinc-200">{keywordText}</span>
+            <p className="mt-0.5 truncate text-sm text-[var(--text-secondary)]">
+              Keyword: <span className="font-medium text-[var(--text-secondary)]">{keywordText}</span>
             </p>
           ) : null}
         </DialogHeader>
@@ -91,8 +91,8 @@ export function RunNewScanModal({
           {/* Grid size */}
           <div className="flex flex-col gap-2">
             <div className="flex items-baseline justify-between">
-              <span className="text-sm font-medium text-zinc-200">Grid size</span>
-              <span className="text-xs text-zinc-500">
+              <span className="text-sm font-medium text-[var(--text-secondary)]">Grid size</span>
+              <span className="text-xs text-[var(--text-muted)]">
                 {gridSize}×{gridSize} = {gridSize * gridSize} points
               </span>
             </div>
@@ -107,8 +107,8 @@ export function RunNewScanModal({
           {/* Radius */}
           <div className="flex flex-col gap-2">
             <div className="flex items-baseline justify-between">
-              <span className="text-sm font-medium text-zinc-200">Search radius</span>
-              <span className="text-xs text-zinc-500">{radiusKm} km between points</span>
+              <span className="text-sm font-medium text-[var(--text-secondary)]">Search radius</span>
+              <span className="text-xs text-[var(--text-muted)]">{radiusKm} km between points</span>
             </div>
             <SegmentedControl
               options={RADIUS_KM_OPTIONS}
@@ -119,14 +119,14 @@ export function RunNewScanModal({
           </div>
 
           {/* Credit cost card */}
-          <div className="flex items-center gap-3 rounded-lg border border-zinc-700 bg-zinc-900/60 px-4 py-3">
+          <div className="flex items-center gap-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)]/60 px-4 py-3">
             <Zap className="h-5 w-5 shrink-0 text-amber-400" aria-hidden />
             <div className="min-w-0 flex-1">
-              <p className="text-sm text-zinc-300">
+              <p className="text-sm text-[var(--text-secondary)]">
                 This scan will use{' '}
-                <span className="font-semibold text-zinc-50">{creditCost} credits</span>
+                <span className="font-semibold text-[var(--text-primary)]">{creditCost} credits</span>
               </p>
-              <p className="mt-0.5 text-[11px] text-zinc-500">
+              <p className="mt-0.5 text-[11px] text-[var(--text-muted)]">
                 {gridSize}×{gridSize} grid · 1 keyword
               </p>
             </div>
@@ -139,7 +139,7 @@ export function RunNewScanModal({
             variant="base-ghost"
             onClick={() => onOpenChange(false)}
             disabled={isRunning}
-            className="text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+            className="text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]"
           >
             Cancel
           </Button>

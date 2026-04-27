@@ -18,7 +18,7 @@ const RankingGridMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-full w-full items-center justify-center bg-zinc-900/50 text-sm text-zinc-500">
+      <div className="flex h-full w-full items-center justify-center bg-[var(--bg-surface)]/50 text-sm text-[var(--text-muted)]">
         Loading map...
       </div>
     ),
@@ -44,18 +44,18 @@ function CompetitorRow({
       type="button"
       onClick={onActivate}
       className={cn(
-        'w-full border-b border-zinc-800/70 px-3 py-2.5 text-left transition-colors last:border-b-0',
-        isActive ? 'bg-zinc-900/70' : 'hover:bg-zinc-900/40'
+        'w-full border-b border-[var(--border-default)]/70 px-3 py-2.5 text-left transition-colors last:border-b-0',
+        isActive ? 'bg-[var(--bg-surface)]/70' : 'hover:bg-[var(--bg-surface)]/40'
       )}
     >
       <div className="flex gap-2">
-        <span className="w-8 shrink-0 pt-0.5 text-xs tabular-nums text-zinc-500">{rankLabel}</span>
+        <span className="w-8 shrink-0 pt-0.5 text-xs tabular-nums text-[var(--text-muted)]">{rankLabel}</span>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-zinc-100">{listing.title}</p>
-          {listing.address ? <p className="mt-0.5 line-clamp-1 text-xs text-zinc-400">{listing.address}</p> : null}
-          <p className="mt-0.5 text-xs text-zinc-500">
+          <p className="truncate text-sm font-semibold text-[var(--text-primary)]">{listing.title}</p>
+          {listing.address ? <p className="mt-0.5 line-clamp-1 text-xs text-[var(--text-secondary)]">{listing.address}</p> : null}
+          <p className="mt-0.5 text-xs text-[var(--text-muted)]">
             {rating != null ? (
-              <span className="inline-flex items-center gap-0.5 text-zinc-400">
+              <span className="inline-flex items-center gap-0.5 text-[var(--text-secondary)]">
                 <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
                 {rating.toFixed(1)}
                 {votes > 0 ? ` (${votes})` : ''}
@@ -119,41 +119,41 @@ export function RankingGridViewerSheet({
         showCloseButton={false}
         className={cn(
           'flex flex-col gap-0 p-0',
-          'inset-x-0 bottom-0 h-[95vh] w-full rounded-t-xl border-t border-zinc-800',
-          'bg-zinc-950 text-zinc-100',
+          'inset-x-0 bottom-0 h-[95vh] w-full rounded-t-xl border-t border-[var(--border-default)]',
+          'bg-[var(--bg-page)] text-[var(--text-primary)]',
           'data-[side=bottom]:max-w-none'
         )}
       >
         <SheetTitle className="sr-only">Ranking Grid Viewer</SheetTitle>
 
-        <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_18rem] border-b border-zinc-800 lg:grid-cols-[minmax(0,1fr)_22rem]">
-          <div className="min-w-0 border-r border-zinc-800 p-2">
+        <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_18rem] border-b border-[var(--border-default)] lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <div className="min-w-0 border-r border-[var(--border-default)] p-2">
             {currentDetail ? (
               <RankingGridScanKpis summary={summary} points={points} previousSummary={previousSummary} />
             ) : (
-              <div className="px-2 py-3 text-sm text-zinc-500">
+              <div className="px-2 py-3 text-sm text-[var(--text-muted)]">
                 {keywordText ? `Keyword: ${keywordText}` : 'Ranking Grid'}
               </div>
             )}
           </div>
           <div className="flex items-center justify-between px-3 py-2">
             <div className="min-w-0">
-              <p className="truncate text-xs font-semibold uppercase tracking-wide text-zinc-400">
+              <p className="truncate text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
                 Competition list
               </p>
               {selectedPoint ? (
-                <p className="truncate text-[11px] text-zinc-500">
+                <p className="truncate text-[11px] text-[var(--text-muted)]">
                   Point #{selectedPoint.point_index}
                   {selectedPoint.rank != null ? ` · Rank ${selectedPoint.rank}` : ''}
                 </p>
               ) : (
-                <p className="truncate text-[11px] text-zinc-500">Select a map pin</p>
+                <p className="truncate text-[11px] text-[var(--text-muted)]">Select a map pin</p>
               )}
             </div>
             <Button
               variant="base-ghost"
               size="icon"
-              className="h-8 w-8 shrink-0 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
+              className="h-8 w-8 shrink-0 text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]"
               onClick={onClose}
               aria-label="Close"
             >
@@ -163,13 +163,13 @@ export function RankingGridViewerSheet({
         </div>
 
         <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_18rem] lg:grid-cols-[minmax(0,1fr)_22rem]">
-          <div className="relative min-h-0 flex-1 bg-zinc-950">
+          <div className="relative min-h-0 flex-1 bg-[var(--bg-page)]">
             {!currentDetail && !showDetailLoader ? (
               <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-zinc-800/60">
-                  <ScanSearch className="h-7 w-7 text-zinc-500" aria-hidden />
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg-subtle)]/60">
+                  <ScanSearch className="h-7 w-7 text-[var(--text-muted)]" aria-hidden />
                 </div>
-                <p className="text-sm text-zinc-500">
+                <p className="text-sm text-[var(--text-muted)]">
                   {scanIdForDetail ? 'Loading scan data...' : 'Select a scan to view the map.'}
                 </p>
               </div>
@@ -183,8 +183,8 @@ export function RankingGridViewerSheet({
               />
             )}
             {showDetailLoader && (
-              <div className="absolute inset-0 z-[1010] flex flex-col items-center justify-center gap-2 bg-zinc-950/85 text-sm text-zinc-400">
-                <Loader2 className="h-8 w-8 animate-spin text-zinc-300" />
+              <div className="absolute inset-0 z-[1010] flex flex-col items-center justify-center gap-2 bg-[var(--bg-page)]/85 text-sm text-[var(--text-secondary)]">
+                <Loader2 className="h-8 w-8 animate-spin text-[var(--text-secondary)]" />
                 <span>Loading scan...</span>
               </div>
             )}
@@ -198,17 +198,17 @@ export function RankingGridViewerSheet({
             ) : null}
           </div>
 
-          <div className="flex h-[calc(100vh-105px)] min-h-0 flex-col border-l border-zinc-800 bg-zinc-950">
-            <div className="shrink-0 border-b border-zinc-800 px-3 py-2 text-[11px] text-zinc-400">
+          <div className="flex h-[calc(100vh-105px)] min-h-0 flex-col border-l border-[var(--border-default)] bg-[var(--bg-page)]">
+            <div className="shrink-0 border-b border-[var(--border-default)] px-3 py-2 text-[11px] text-[var(--text-secondary)]">
               Competitors ({competitors.length})
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto">
               {!selectedPoint ? (
-                <div className="flex h-full items-center justify-center px-4 text-center text-sm text-zinc-500">
+                <div className="flex h-full items-center justify-center px-4 text-center text-sm text-[var(--text-muted)]">
                   Select a pin on the map to load nearby competitors.
                 </div>
               ) : competitors.length === 0 ? (
-                <div className="px-4 py-8 text-center text-sm text-zinc-500">
+                <div className="px-4 py-8 text-center text-sm text-[var(--text-muted)]">
                   No listings returned for this pin.
                 </div>
               ) : (

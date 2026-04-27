@@ -51,21 +51,21 @@ export function RankingGridKeywordPanel({
 
   const triggerSummary = selected ? (
     <span className="truncate text-left">
-      <span className="font-medium text-zinc-100">{selected.keyword}</span>
-      <span className="font-normal text-zinc-500"> · {formatNumber(selected.search_volume)}/mo</span>
-      <span className="font-normal text-zinc-500"> · {selectedHasGrid ? 'Has grid' : 'No grid yet'}</span>
+      <span className="font-medium text-[var(--text-primary)]">{selected.keyword}</span>
+      <span className="font-normal text-[var(--text-muted)]"> · {formatNumber(selected.search_volume)}/mo</span>
+      <span className="font-normal text-[var(--text-muted)]"> · {selectedHasGrid ? 'Has grid' : 'No grid yet'}</span>
     </span>
   ) : (
-    <span className="text-zinc-500">Select keyword...</span>
+    <span className="text-[var(--text-muted)]">Select keyword...</span>
   );
 
   return (
     <div className="flex flex-col gap-1">
-      <Label className={cn('text-xs text-zinc-400', labelClassName)}>Keyword</Label>
+      <Label className={cn('text-xs text-[var(--text-secondary)]', labelClassName)}>Keyword</Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           className={cn(
-            'inline-flex h-9 w-[min(100%,380px)] max-w-full items-center justify-between gap-2 rounded-md border border-zinc-700 bg-zinc-900 px-3 text-sm font-normal text-zinc-100 hover:bg-zinc-800 hover:text-zinc-100',
+            'inline-flex h-9 w-[min(100%,380px)] max-w-full items-center justify-between gap-2 rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-sm font-normal text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]',
             triggerClassName
           )}
         >
@@ -74,26 +74,26 @@ export function RankingGridKeywordPanel({
         </PopoverTrigger>
         <PopoverContent
           align="start"
-          className="w-[min(560px,calc(100vw-2rem))] border-zinc-700 bg-zinc-950 p-0 text-zinc-100 shadow-xl"
+          className="w-[min(560px,calc(100vw-2rem))] border-[var(--border-default)] bg-[var(--bg-page)] p-0 text-[var(--text-primary)] shadow-xl"
         >
-          <div className="border-b border-zinc-800 px-3 py-2">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+          <div className="border-b border-[var(--border-default)] px-3 py-2">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--text-muted)]">
               Keywords by volume
             </p>
           </div>
           <div className="h-[min(360px,50vh)] overflow-y-auto">
             <Table>
               <TableHeader>
-                <TableRow className="border-zinc-800 hover:bg-transparent">
-                  <TableHead className="h-9 text-zinc-400">Keyword</TableHead>
-                  <TableHead className="h-9 w-[100px] text-right text-zinc-400">Volume</TableHead>
-                  <TableHead className="h-9 w-[140px] text-zinc-400">Grid</TableHead>
+                <TableRow className="border-[var(--border-default)] hover:bg-transparent">
+                  <TableHead className="h-9 text-[var(--text-secondary)]">Keyword</TableHead>
+                  <TableHead className="h-9 w-[100px] text-right text-[var(--text-secondary)]">Volume</TableHead>
+                  <TableHead className="h-9 w-[140px] text-[var(--text-secondary)]">Grid</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sorted.length === 0 ? (
-                  <TableRow className="border-zinc-800 hover:bg-transparent">
-                    <TableCell colSpan={3} className="py-8 text-center text-sm text-zinc-500">
+                  <TableRow className="border-[var(--border-default)] hover:bg-transparent">
+                    <TableCell colSpan={3} className="py-8 text-center text-sm text-[var(--text-muted)]">
                       No keywords for this location.
                     </TableCell>
                   </TableRow>
@@ -105,34 +105,28 @@ export function RankingGridKeywordPanel({
                       <TableRow
                         key={kw.id}
                         className={cn(
-                          'cursor-pointer border-zinc-800',
-                          isSelected ? 'bg-zinc-800/60' : 'hover:bg-zinc-900'
+                          'cursor-pointer border-[var(--border-default)]',
+                          isSelected ? 'bg-[var(--bg-subtle)]/60' : 'hover:bg-[var(--bg-surface)]'
                         )}
                         onClick={() => {
                           onSelectKeyword(kw.id);
                           setOpen(false);
                         }}
                       >
-                        <TableCell className="max-w-[220px] py-2 font-medium text-zinc-100">
+                        <TableCell className="max-w-[220px] py-2 font-medium text-[var(--text-primary)]">
                           <span className="line-clamp-2">{kw.keyword}</span>
                         </TableCell>
-                        <TableCell className="py-2 text-right tabular-nums text-zinc-300">
+                        <TableCell className="py-2 text-right tabular-nums text-[var(--text-secondary)]">
                           {formatNumber(kw.search_volume)}
                         </TableCell>
                         <TableCell className="py-2">
                           {hasGrid ? (
-                            <Badge
-                              variant="base-outline"
-                              className="inline-flex items-center gap-1 border-emerald-800/80 bg-emerald-950/40 text-[10px] font-medium text-emerald-200"
-                            >
+                            <Badge variant="success" className="text-[10px] gap-1 shrink-0 font-medium">
                               <CheckCircle className="h-3 w-3" aria-hidden />
                               Has grid
                             </Badge>
                           ) : (
-                            <Badge
-                              variant="base-outline"
-                              className="inline-flex items-center gap-1 border-amber-700/60 bg-amber-950/30 text-[10px] font-medium text-amber-200"
-                            >
+                            <Badge variant="warning" className="text-[10px] gap-1 shrink-0 font-medium">
                               <Clock className="h-3 w-3" aria-hidden />
                               No grid yet
                             </Badge>

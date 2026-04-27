@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Copy, ExternalLink, Star } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { RankingGridListingOut, RankingGridPointResultOut } from '@/types/rankingGrid';
@@ -50,13 +51,13 @@ function CompetitorRow({
       type="button"
       onClick={onActivate}
       className={cn(
-        'w-full border-b border-zinc-800/80 px-3 py-2.5 text-left transition-colors last:border-b-0',
-        'hover:bg-zinc-900/70',
-        isActive ? 'bg-zinc-900/75 ring-1 ring-inset ring-brand-500/30' : ''
+        'w-full border-b border-[var(--border-default)]/80 px-3 py-2.5 text-left transition-colors last:border-b-0',
+        'hover:bg-[var(--bg-surface)]/70',
+        isActive ? 'bg-[var(--bg-surface)]/75 ring-1 ring-inset ring-brand-500/30' : ''
       )}
     >
       <div className="flex gap-2">
-        <span className="w-8 shrink-0 pt-0.5 text-xs tabular-nums text-zinc-500">{rankLabel}</span>
+        <span className="w-8 shrink-0 pt-0.5 text-xs tabular-nums text-[var(--text-muted)]">{rankLabel}</span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
             {listing.url ? (
@@ -70,23 +71,25 @@ function CompetitorRow({
                 {listing.title}
               </a>
             ) : (
-              <span className="text-sm font-semibold text-zinc-100">{listing.title}</span>
+              <span className="text-sm font-semibold text-[var(--text-primary)]">{listing.title}</span>
             )}
             {listing.is_own_business ? (
-              <span className="rounded bg-primary/20 px-1 py-px text-[10px] font-medium text-primary">You</span>
+              <Badge variant="brand" className="px-1 py-px text-[10px] font-medium">
+                You
+              </Badge>
             ) : null}
           </div>
-          {listing.address ? <p className="mt-0.5 line-clamp-1 text-xs text-zinc-400">{listing.address}</p> : null}
-          <p className="mt-0.5 text-xs text-zinc-500">
+          {listing.address ? <p className="mt-0.5 line-clamp-1 text-xs text-[var(--text-secondary)]">{listing.address}</p> : null}
+          <p className="mt-0.5 text-xs text-[var(--text-muted)]">
             {rating != null ? (
-              <span className="inline-flex items-center gap-0.5 text-zinc-400">
+              <span className="inline-flex items-center gap-0.5 text-[var(--text-secondary)]">
                 <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
                 {rating.toFixed(1)}
                 {votes > 0 ? ` (${votes})` : ''}
               </span>
             ) : null}
-            {rating != null && listing.category ? <span className="text-zinc-600"> · </span> : null}
-            {listing.category ? <span className="text-zinc-500">{listing.category}</span> : null}
+            {rating != null && listing.category ? <span className="text-[var(--text-muted)]"> · </span> : null}
+            {listing.category ? <span className="text-[var(--text-muted)]">{listing.category}</span> : null}
           </p>
         </div>
       </div>
@@ -136,16 +139,16 @@ export function RankingGridSidePanel({
       : null;
 
   return (
-    <aside className="flex h-full min-h-0 flex-col bg-zinc-950">
-      <div className="border-b border-zinc-800 bg-zinc-900/40 px-3 py-3">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-200">Competitors</h2>
+    <aside className="flex h-full min-h-0 flex-col bg-[var(--bg-page)]">
+      <div className="border-b border-[var(--border-default)] bg-[var(--bg-surface)]/40 px-3 py-3">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">Competitors</h2>
         {selectedPoint ? (
           <div className="mt-1 space-y-1">
-            <p className="text-[11px] text-zinc-400">
+            <p className="text-[11px] text-[var(--text-secondary)]">
               Point #{selectedPoint.point_index}
               {selectedPoint.rank != null ? ` · Rank ${selectedPoint.rank}` : ''}
             </p>
-            <p className="font-mono text-[11px] tabular-nums text-zinc-300">{coordLine}</p>
+            <p className="font-mono text-[11px] tabular-nums text-[var(--text-secondary)]">{coordLine}</p>
             <div className="flex gap-1 pt-0.5">
               <Button
                 type="button"
@@ -170,22 +173,22 @@ export function RankingGridSidePanel({
             </div>
           </div>
         ) : (
-          <p className="mt-1 text-xs text-zinc-500">Click a grid point to explore competitors.</p>
+          <p className="mt-1 text-xs text-[var(--text-muted)]">Click a grid point to explore competitors.</p>
         )}
       </div>
 
       {!selectedPoint ? (
-        <div className="flex min-h-0 flex-1 items-center justify-center px-4 text-center text-sm text-zinc-500">
+        <div className="flex min-h-0 flex-1 items-center justify-center px-4 text-center text-sm text-[var(--text-muted)]">
           Select a pin on the map to load nearby competitors.
         </div>
       ) : (
         <>
-          <div className="border-b border-zinc-800 px-3 py-2 text-[11px] text-zinc-400">
+          <div className="border-b border-[var(--border-default)] px-3 py-2 text-[11px] text-[var(--text-secondary)]">
             Competitors ({competitors.length})
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto">
             {competitors.length === 0 ? (
-              <div className="px-4 py-8 text-center text-sm text-zinc-500">
+              <div className="px-4 py-8 text-center text-sm text-[var(--text-muted)]">
                 No listings returned for this pin.
               </div>
             ) : (
@@ -200,10 +203,10 @@ export function RankingGridSidePanel({
             )}
           </div>
           {selectedCompetitor ? (
-            <div className="max-h-[40%] shrink-0 overflow-y-auto border-t border-zinc-800 bg-zinc-900/30 p-3">
+            <div className="max-h-[40%] shrink-0 overflow-y-auto border-t border-[var(--border-default)] bg-[var(--bg-surface)]/30 p-3">
               <RankingGridCompetitorDetail
                 listing={selectedCompetitor}
-                className="border-zinc-700 bg-zinc-900/70 shadow-none"
+                className="border-[var(--border-default)] bg-[var(--bg-surface)]/70 shadow-none"
               />
             </div>
           ) : null}

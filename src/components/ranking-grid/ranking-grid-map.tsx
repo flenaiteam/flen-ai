@@ -194,11 +194,11 @@ export function RankingGridMap({
 
   if (points.length === 0) {
     return (
-      <div className={cn('flex min-h-0 flex-1 items-center justify-center bg-zinc-950/95 text-sm text-zinc-500', className)}>
+      <div className={cn('flex min-h-0 flex-1 items-center justify-center bg-[var(--bg-page)]/95 text-sm text-[var(--text-muted)]', className)}>
         Run a scan to see grid points on the map.
       </div>
     );
   }
 
-  return <div ref={containerRef} className={cn('h-full min-h-0 w-full bg-zinc-900', className)} />;
+  return <div ref={containerRef} className={cn('h-full min-h-0 w-full bg-[var(--bg-surface)]', className)} />;
 }

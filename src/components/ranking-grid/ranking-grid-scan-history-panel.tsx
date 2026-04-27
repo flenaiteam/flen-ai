@@ -1,6 +1,7 @@
 'use client';
 
 import { Loader2, Plus, ScanSearch, TrendingDown, TrendingUp } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { MergedRankingGridScanRow } from '@/types/rankingGrid';
@@ -30,32 +31,32 @@ function DeltaChip({
 }) {
   if (kind === 'first_scan') {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-blue-950/60 px-1.5 py-0.5 text-[10px] font-medium text-blue-300 ring-1 ring-blue-700/50">
-        <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+      <Badge variant="info" className="text-[10px] px-1.5 py-0 shrink-0 gap-1 font-medium">
+        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--soft-info-accent)]" aria-hidden />
         First
-      </span>
+      </Badge>
     );
   }
   if (kind === 'unchanged' || value == null) {
     return (
-      <span className="inline-flex items-center rounded-full bg-zinc-800/60 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400">
+      <Badge variant="default" className="text-[10px] px-1.5 py-0 shrink-0 font-medium tabular-nums">
         —
-      </span>
+      </Badge>
     );
   }
   if (kind === 'improved') {
     return (
-      <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-950/60 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-300 ring-1 ring-emerald-700/50">
+      <Badge variant="success" className="text-[10px] px-1.5 py-0 shrink-0 gap-0.5 font-semibold tabular-nums">
         <TrendingUp className="h-3 w-3" aria-hidden />
         {Math.abs(Number(value)).toFixed(1)}
-      </span>
+      </Badge>
     );
   }
   return (
-    <span className="inline-flex items-center gap-0.5 rounded-full bg-rose-950/60 px-1.5 py-0.5 text-[10px] font-semibold text-rose-300 ring-1 ring-rose-700/50">
+    <Badge variant="error" className="text-[10px] px-1.5 py-0 shrink-0 gap-0.5 font-semibold tabular-nums">
       <TrendingDown className="h-3 w-3" aria-hidden />
       {Math.abs(Number(value)).toFixed(1)}
-    </span>
+    </Badge>
   );
 }
 
@@ -99,32 +100,32 @@ export function RankingGridScanHistoryPanel({
     : scans[0] ?? null;
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-zinc-950">
+    <div className="flex h-full flex-col overflow-hidden bg-[var(--bg-page)]">
       {/* Header */}
-      <div className="shrink-0 flex justify-between items-center border-b border-zinc-800 px-4 py-2 h-[38px]" >
-        <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+      <div className="shrink-0 flex justify-between items-center border-b border-[var(--border-default)] px-4 py-2 h-[38px]" >
+        <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--text-muted)]">
           Scan history
         </p>
         {keywordText ? (
-          <p className="mt-0.5 truncate text-sm font-medium text-zinc-200">{keywordText}</p>
+          <p className="mt-0.5 truncate text-sm font-medium text-[var(--text-secondary)]">{keywordText}</p>
         ) : null}
       </div>
 
       {/* Body */}
       {isLoading ? (
-        <div className="flex flex-1 items-center justify-center gap-2 text-sm text-zinc-500 p-4">
+        <div className="flex flex-1 items-center justify-center gap-2 text-sm text-[var(--text-muted)] p-4">
           <Loader2 className="h-4 w-4 animate-spin" />
           Loading scans…
         </div>
       ) : scans.length === 0 ? (
         /* No scans empty state */
         <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-800/60">
-            <ScanSearch className="h-6 w-6 text-zinc-400" aria-hidden />
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--bg-subtle)]/60">
+            <ScanSearch className="h-6 w-6 text-[var(--text-secondary)]" aria-hidden />
           </div>
           <div>
-            <p className="text-sm font-medium text-zinc-300">No scans yet</p>
-            <p className="mt-1 text-xs text-zinc-500">
+            <p className="text-sm font-medium text-[var(--text-secondary)]">No scans yet</p>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">
               Run a scan to start tracking map rankings for this keyword.
             </p>
           </div>
@@ -153,8 +154,8 @@ export function RankingGridScanHistoryPanel({
                   key={scan.public_id}
                   type="button"
                   className={cn(
-                    'flex w-full items-center justify-between gap-3 border-b border-zinc-800/60 px-4 py-3 text-left transition-colors last:border-b-0',
-                    isSelected ? 'bg-zinc-800/60' : 'hover:bg-zinc-900/60'
+                    'flex w-full items-center justify-between gap-3 border-b border-[var(--border-default)]/60 px-4 py-3 text-left transition-colors last:border-b-0',
+                    isSelected ? 'bg-[var(--bg-subtle)]/60' : 'hover:bg-[var(--bg-surface)]/60'
                   )}
                   onClick={() => {
                     onSelectScan(scan.public_id);
@@ -162,20 +163,20 @@ export function RankingGridScanHistoryPanel({
                   }}
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-zinc-100">
+                    <p className="truncate text-sm font-medium text-[var(--text-primary)]">
                       {formatScanDate(scan)}
                     </p>
-                    <p className="mt-0.5 truncate text-[11px] text-zinc-400">
+                    <p className="mt-0.5 truncate text-[11px] text-[var(--text-secondary)]">
                       {formatScanConfig(scan)}
                     </p>
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">
                     {scan.summary?.avg_rank != null ? (
-                      <span className="text-sm font-semibold tabular-nums text-zinc-200">
+                      <span className="text-sm font-semibold tabular-nums text-[var(--text-secondary)]">
                         #{Number(scan.summary.avg_rank).toFixed(1)}
                       </span>
                     ) : (
-                      <span className="text-sm tabular-nums text-zinc-500">—</span>
+                      <span className="text-sm tabular-nums text-[var(--text-muted)]">—</span>
                     )}
                     <DeltaChip kind={deltaKind} value={deltaValue} />
                   </div>
@@ -186,7 +187,7 @@ export function RankingGridScanHistoryPanel({
 
           {/* CTA: open selected scan in full sheet */}
           {selectedScan && (
-            <div className="shrink-0 border-t border-zinc-800 bg-zinc-950 p-3">
+            <div className="shrink-0 border-t border-[var(--border-default)] bg-[var(--bg-page)] p-3">
               <Button
                 onClick={onOpenScan}
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
@@ -199,11 +200,11 @@ export function RankingGridScanHistoryPanel({
       )}
 
       {/* Footer: run new scan */}
-      <div className="shrink-0 border-t border-zinc-800">
+      <div className="shrink-0 border-t border-[var(--border-default)]">
         <button
           type="button"
           onClick={onRunNewScan}
-          className="flex w-full items-center gap-2 px-4 py-3 text-sm text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100"
+          className="flex w-full items-center gap-2 px-4 py-3 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)]"
         >
           <Plus className="h-4 w-4" aria-hidden />
           Run new scan

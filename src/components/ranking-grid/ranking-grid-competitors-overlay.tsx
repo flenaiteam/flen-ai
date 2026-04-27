@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { ChevronDown, ChevronUp, Copy, ExternalLink, GripVertical, Star } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { RankingGridListingOut, RankingGridPointResultOut } from '@/types/rankingGrid';
@@ -66,9 +67,9 @@ function CompetitorRowCompact({
       type="button"
       onClick={onActivate}
       className={cn(
-        'w-full border-b border-zinc-800/80 px-2 py-2.5 text-left transition-colors last:border-b-0',
-        'hover:bg-zinc-900/80',
-        isActive ? 'border-l-2 border-l-indigo-500 bg-zinc-900/50 pl-[6px]' : 'border-l-2 border-l-transparent'
+        'w-full border-b border-[var(--border-default)]/80 px-2 py-2.5 text-left transition-colors last:border-b-0',
+        'hover:bg-[var(--bg-surface)]/80',
+        isActive ? 'border-l-2 border-l-indigo-500 bg-[var(--bg-surface)]/50 pl-[6px]' : 'border-l-2 border-l-transparent'
       )}
     >
       <div className="flex gap-2">
@@ -77,7 +78,9 @@ function CompetitorRowCompact({
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
             {titleEl}
             {listing.is_own_business ? (
-              <span className="rounded bg-primary/20 px-1 py-px text-[10px] font-medium text-primary">You</span>
+              <Badge variant="brand" className="px-1 py-px text-[10px] font-medium">
+                You
+              </Badge>
             ) : null}
           </div>
           {listing.address ? <p className="mt-0.5 line-clamp-1 text-xs text-slate-400">{listing.address}</p> : null}
@@ -210,7 +213,7 @@ export function RankingGridCompetitorsOverlay({
       ref={panelRef}
       style={{ transform: `translate(${offset.x}px, ${offset.y}px)` }}
       className={cn(
-        'pointer-events-auto flex min-h-0 w-[min(300px,92vw)] max-h-[min(72vh,calc(100dvh-6.5rem))] flex-col overflow-hidden rounded-2xl border border-amber-200/25 bg-zinc-950/92 shadow-xl shadow-amber-900/10 ring-1 ring-amber-400/10 backdrop-blur-md',
+        'pointer-events-auto flex min-h-0 w-[min(300px,92vw)] max-h-[min(72vh,calc(100dvh-6.5rem))] flex-col overflow-hidden rounded-2xl border border-amber-200/25 bg-[var(--bg-page)]/92 shadow-xl shadow-amber-900/10 ring-1 ring-amber-400/10 backdrop-blur-md',
         className
       )}
     >
@@ -227,7 +230,7 @@ export function RankingGridCompetitorsOverlay({
             <div className="mt-1 space-y-1">
               {selectedPoint ? (
                 <>
-                  <p className="text-[10px] text-zinc-500">
+                  <p className="text-[10px] text-[var(--text-muted)]">
                     Point #{selectedPoint.point_index}
                     {selectedPoint.rank != null ? ` · Rank ${selectedPoint.rank}` : ''} · drag header to move
                   </p>
@@ -267,13 +270,13 @@ export function RankingGridCompetitorsOverlay({
                   </div>
                 </>
               ) : (
-                <p className="text-[10px] text-zinc-600">Select a grid point on the map · drag header to move</p>
+                <p className="text-[10px] text-[var(--text-muted)]">Select a grid point on the map · drag header to move</p>
               )}
             </div>
           ) : (
-            <p className="text-[10px] text-zinc-500">
+            <p className="text-[10px] text-[var(--text-muted)]">
               {competitors.length > 0 ? `${competitors.length} listed` : 'None'}
-              {coordLine ? <span className="ml-1 font-mono tabular-nums text-zinc-600">{coordLine}</span> : null}
+              {coordLine ? <span className="ml-1 font-mono tabular-nums text-[var(--text-muted)]">{coordLine}</span> : null}
             </p>
           )}
         </div>
@@ -281,7 +284,7 @@ export function RankingGridCompetitorsOverlay({
           type="button"
           variant="base-ghost"
           size="icon"
-          className="mt-0.5 h-8 w-8 shrink-0 text-zinc-400 hover:bg-zinc-800/80 hover:text-zinc-100"
+          className="mt-0.5 h-8 w-8 shrink-0 text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)]/80 hover:text-[var(--text-primary)]"
           aria-label={minimized ? 'Expand competitors list' : 'Minimize competitors list'}
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => {
@@ -296,7 +299,7 @@ export function RankingGridCompetitorsOverlay({
       {!minimized ? (
         <div className="min-h-0 overflow-y-auto overscroll-contain [max-height:min(56vh,calc(100dvh-9rem))]">
           {competitors.length === 0 ? (
-            <div className="px-3 py-8 text-center text-sm text-zinc-500">
+            <div className="px-3 py-8 text-center text-sm text-[var(--text-muted)]">
               {selectedPoint
                 ? 'No listings returned for this pin. Coordinates are shown above.'
                 : 'Select a grid point on the map to see competitors.'}

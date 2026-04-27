@@ -312,7 +312,7 @@ export default function RankingGridPage() {
 
   if (!currentLocation || !organization) {
     return (
-      <div className="min-h-screen bg-zinc-950 p-6">
+      <div className="min-h-screen bg-[var(--bg-page)] p-6">
         <Alert variant="error" className="mx-auto max-w-2xl">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
@@ -326,9 +326,9 @@ export default function RankingGridPage() {
   // ── Render ────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex h-full flex-col bg-zinc-950 text-zinc-100">
+    <div className="flex h-full flex-col bg-[var(--bg-page)] text-[var(--text-primary)]">
 
-      <div className="shrink-0 border-b border-zinc-800 px-6 py-4">
+      <div className="shrink-0 border-b border-[var(--border-default)] px-6 py-4">
         <h1 className="font-display text-2xl font-semibold text-[var(--text-primary)]">Ranking Grid</h1>
         <p className="text-sm text-[var(--text-secondary)]">Track local map rankings across your service area.</p>
       </div>
@@ -336,7 +336,7 @@ export default function RankingGridPage() {
       {/* ── Two-column shell — each column is self-contained and scrolls internally ── */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left — 50%, self-scrolling */}
-        <div className="flex h-full w-1/2 shrink-0 flex-col border-r border-zinc-800">
+        <div className="flex h-full w-1/2 shrink-0 flex-col border-r border-[var(--border-default)]">
           <RankingGridKeywordList
             keywords={keywords}
             gridsList={gridsList}
@@ -359,8 +359,8 @@ export default function RankingGridPage() {
             />
           ) : (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
-              <div className="h-16 w-16 rounded-full bg-zinc-800/40" />
-              <p className="text-sm text-zinc-600">Select a keyword to see scan history</p>
+              <div className="h-16 w-16 rounded-full bg-[var(--bg-subtle)]/40" />
+              <p className="text-sm text-[var(--text-muted)]">Select a keyword to see scan history</p>
             </div>
           )}
         </div>
