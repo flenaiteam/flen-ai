@@ -40,3 +40,52 @@ export interface GeneratePostBulkPayload {
   response?: Record<string, unknown>;
   meta?: { context_sent: ContextSent };
 }
+
+// ── Competitor keyword ranks (ranking grid snapshot; Local Pack from stored scans) ──
+
+export interface GBPCompetitorRanking {
+  rank: number | null;
+  title: string;
+  place_id: string;
+  cid: string;
+  rating_value: number | null;
+  rating_votes_count: number | null;
+  address: string;
+  url: string | null;
+  website_url?: string | null;
+}
+
+export interface GBPFieldComparisonRow {
+  field: string;
+  label: string;
+  yours: number | null;
+  competitor_avg: number | null;
+  winner: string;
+}
+
+export interface GBPCompetitorKeywordRank {
+  keyword_id: number;
+  keyword_text: string;
+  our_rank: number | "N/A";
+  our_rating?: number | null;
+  our_reviews?: number | null;
+  our_has_website?: boolean;
+  competitor_avg_rank?: number | null;
+  competitor_avg_rating?: number | null;
+  competitor_avg_reviews?: number | null;
+  competitor_website_rate_pct?: number | null;
+  field_comparison?: GBPFieldComparisonRow[];
+  competitors: GBPCompetitorRanking[];
+}
+
+export interface GBPCompetitorKeywordRanksResponse {
+  snapshot_id: number | null;
+  snapshot_uuid: string | null;
+  snapshot_date: string | null;
+  data_source?: string | null;
+  keywords: GBPCompetitorKeywordRank[];
+  message?: string | null;
+  active_keyword_count?: number | null;
+  latest_snapshot_status?: string | null;
+  latest_snapshot_progress?: string | null;
+}

@@ -24,7 +24,7 @@ import {
   RefreshCw,
   Search,
   Sun,
-  Users2,
+  Target,
   BarChart3,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -74,7 +74,7 @@ const GBP_SECTIONS = [
   { id: "posts", label: "Posts", icon: FileText, href: "/posts" },
   { id: "keywords", label: "Keywords", icon: Search, href: "/keywords" },
   // { id: "search-rankings", label: "Search Rankings", icon: BarChart3, href: "/search-rankings" },
-  // { id: "competitors", label: "Competitors", icon: Users2, href: "/competitors" },
+  { id: "competitors", label: "Competitors", icon: Target, href: "/competitors" },
   { id: "ranking-grid", label: "Ranking Grid", icon: LayoutGrid, href: "/ranking-grid" },
 ];
 
@@ -383,7 +383,7 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
         {/* ── Body ────────────────────────────────────────────────────────── */}
         <div className="flex min-w-0 w-full flex-1 flex-col gap-6 p-4 sm:p-6 md:flex-row md:items-start">
           {/* Sidebar nav */}
-          <nav className="flex h-auto w-full shrink-0 flex-row gap-1 overflow-x-auto rounded-xl border border-border/70 bg-background/90 p-1 shadow-sm md:sticky md:top-20 md:h-fit md:w-64 md:flex-col md:gap-2 md:overflow-visible md:p-3">
+          <nav className="flex h-auto w-full shrink-0 flex-row gap-1 overflow-x-auto rounded-xl border border-border/70 bg-background/90 p-1 md:sticky md:top-20 md:h-fit md:w-64 md:flex-col md:gap-2 md:overflow-visible md:p-3">
             {GBP_SECTIONS.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -397,7 +397,7 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
                   className={cn(
                     "inline-flex w-auto items-center justify-start gap-2 whitespace-nowrap border-b-2 px-3 py-2 text-sm transition-colors md:w-full md:border-b-0",
                     isActive
-                      ? "border-brand-500 text-brand-600 md:rounded-lg md:border-none md:bg-soft-brand-bg md:text-soft-brand-text md:shadow-sm"
+                      ? "border-brand-500 text-brand-600 md:rounded-lg md:border-none md:bg-soft-brand-bg md:text-soft-brand-text"
                       : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] md:rounded-lg md:hover:bg-[var(--bg-subtle)]"
                   )}
                 >
@@ -409,7 +409,7 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
           </nav>
 
           {/* Page content */}
-          <main className="min-w-0 w-full grow overflow-hidden rounded-2xl border border-border/70 bg-background/85 text-start shadow-sm">
+          <main className="min-w-0 w-full grow overflow-hidden rounded-2xl border border-border/70 bg-background/85 text-start">
             {children}
           </main>
         </div>

@@ -8,6 +8,16 @@ import {
 import type { RootState } from '@/lib/redux/store';
 import { tryStytchSessionRefresh } from '@/lib/auth/sessionRefreshBridge';
 
+/** DRF returns the JSON body directly; support optional `{ data: ... }` wrappers. */
+function unwrapDrfBody<T>(response: unknown): T | null {
+  if (!response || typeof response !== 'object') return null;
+  const r = response as Record<string, unknown>;
+  if ('data' in r && r.data !== undefined && typeof r.data === 'object' && r.data !== null) {
+    return r.data as T;
+  }
+  return r as T;
+}
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface User {
@@ -651,10 +661,83 @@ const baseApi = createApi({
       providesTags: ['GBP'],
     }),
 
-    getGBPCompetitorKeywordRanks: builder.query<unknown, string>({
+    getGBPCompetitorKeywordRanks: builder.query<
+      import('@/types/gbp').GBPCompetitorKeywordRanksResponse,
+      string
+    >({
       query: (locationPublicId) =>
         `/organizations/locations/${locationPublicId}/gbp/serp/competitor-keyword-ranks/`,
+      transformResponse: (response: unknown) => {
+        const d = unwrapDrfBody<import('@/types/gbp').GBPCompetitorKeywordRanksResponse>(response);
+        if (!d) {
+          return {
+            snapshot_id: null,
+            snapshot_uuid: null,
+            snapshot_date: null,
+            keywords: [],
+          };
+        }
+        return {
+          snapshot_id: d.snapshot_id ?? null,
+          snapshot_uuid: d.snapshot_uuid ?? null,
+          snapshot_date: d.snapshot_date ?? null,
+          data_source: d.data_source ?? null,
+          keywords: d.keywords ?? [],
+          message: d.message ?? null,
+          active_keyword_count: d.active_keyword_count ?? null,
+          latest_snapshot_status: d.latest_snapshot_status ?? null,
+          latest_snapshot_progress: d.latest_snapshot_progress ?? null,
+        };
+      },
       providesTags: ['GBP'],
+    }),
+
+    /** AI gap analysis using stored ranking grid + GBP context (no SERP refresh). */
+    runGBPCompetitiveGap: builder.mutation<
+      {
+        own_profile: Record<string, unknown> | null;
+        competitors: Array<Record<string, unknown>>;
+        keywords_tracked: string[];
+        analysis: {
+          gaps?: Array<Record<string, unknown>>;
+          action_plan?: Array<Record<string, unknown>>;
+          competitive_position?: string;
+          summary?: string;
+        } | null;
+        error?: string;
+        detail?: string;
+      },
+      string
+    >({
+      query: (locationPublicId) => ({
+        url: `/organizations/locations/${locationPublicId}/gbp/competitor-gap/`,
+        method: 'POST',
+      }),
+      transformResponse: (raw: unknown) => {
+        const r = raw as Record<string, unknown> | { data?: Record<string, unknown> };
+        const d = ('data' in r && r.data && typeof r.data === 'object' ? r.data : r) as Record<
+          string,
+          unknown
+        >;
+        return {
+          own_profile: (d.own_profile as Record<string, unknown>) ?? null,
+          competitors: Array.isArray(d.competitors) ? (d.competitors as Array<Record<string, unknown>>) : [],
+          keywords_tracked: Array.isArray(d.keywords_tracked)
+            ? (d.keywords_tracked as string[])
+            : [],
+          analysis:
+            d.analysis && typeof d.analysis === 'object'
+              ? (d.analysis as {
+                  gaps?: Array<Record<string, unknown>>;
+                  action_plan?: Array<Record<string, unknown>>;
+                  competitive_position?: string;
+                  summary?: string;
+                })
+              : null,
+          error: d.error as string | undefined,
+          detail: d.detail as string | undefined,
+        };
+      },
     }),
 
     // ── Ranking Grid (Local Grid / Whitespark-style) ─────────────────────────
@@ -850,6 +933,7 @@ export const {
   useRunCategoryFixerMutation,
   useGetGBPSERPRankingsQuery,
   useGetGBPCompetitorKeywordRanksQuery,
+  useRunGBPCompetitiveGapMutation,
   useGetRankingGridsQuery,
   useCreateRankingGridMutation,
   useTriggerRankingGridScanMutation,
