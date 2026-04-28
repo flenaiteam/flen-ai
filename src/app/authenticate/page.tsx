@@ -26,6 +26,7 @@ import {
   CreateLocationFormFields,
   buildCreateLocationPayload,
 } from '@/components/locations/create-location-form-fields';
+import GooglePlacesAutocomplete from '@/components/ui/google-places-autocomplete';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -85,9 +86,10 @@ export default function AuthPage() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  // Org creation form
+  // Org creation form (match fe-flen: Google place + place_id required)
   const [orgName, setOrgName] = useState('');
-  const [orgAddress, setOrgAddress] = useState('');
+  const [orgSelectedPlace, setOrgSelectedPlace] =
+    useState<google.maps.places.PlaceResult | null>(null);
 
   // Location creation form
   const [locName, setLocName] = useState('');
@@ -214,24 +216,27 @@ export default function AuthPage() {
   const handleCreateOrg = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!ist || !orgName.trim()) return;
+      if (!ist || !orgName.trim() || !orgSelectedPlace?.place_id) {
+        setError('Please fill in all required fields.');
+        return;
+      }
       setError(null);
 
       try {
         const data = await createOrganization({
           name: orgName.trim(),
           intermediate_session_token: ist,
-          ...(orgAddress.trim() ? { place_id: orgAddress.trim() } : {}),
+          place_id: orgSelectedPlace.place_id,
         }).unwrap();
 
         commitAuthResponse(data);
         handleLocations(data.locations ?? []);
       } catch (err: unknown) {
-        const e = err as { data?: { error?: string }; message?: string };
-        setError(e?.data?.error ?? e?.message ?? 'Could not create organization.');
+        const ev = err as { data?: { error?: string }; message?: string };
+        setError(ev?.data?.error ?? ev?.message ?? 'Could not create organization.');
       }
     },
-    [ist, orgName, orgAddress, createOrganization, commitAuthResponse, handleLocations]
+    [ist, orgName, orgSelectedPlace, createOrganization, commitAuthResponse, handleLocations]
   );
 
   // ── Select location ───────────────────────────────────────────────────────
@@ -249,7 +254,10 @@ export default function AuthPage() {
   const handleCreateLocation = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!locName.trim()) return;
+      if (!locName.trim() || !locSelectedPlace?.place_id) {
+        setError('Please fill in all required fields.');
+        return;
+      }
       setError(null);
 
       try {
@@ -260,8 +268,8 @@ export default function AuthPage() {
         dispatch(setCurrentLocation(loc));
         router.replace('/dashboard');
       } catch (err: unknown) {
-        const e = err as { data?: { error?: string }; message?: string };
-        setError(e?.data?.error ?? e?.message ?? 'Could not create location.');
+        const ev = err as { data?: { error?: string }; message?: string };
+        setError(ev?.data?.error ?? ev?.message ?? 'Could not create location.');
       }
     },
     [locName, locSelectedPlace, createLocation, dispatch, router]
@@ -446,7 +454,7 @@ export default function AuthPage() {
 
         {/* ══ CREATE_ORG ═════════════════════════════════════════════════════ */}
         {phase === 'CREATE_ORG' && (
-          <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-hidden">
+          <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-visible">
             <div className="px-6 pt-6 pb-4 border-b border-[var(--border-default)]">
               <h2 className="font-display text-lg font-semibold text-[var(--text-primary)]">
                 Create your organization
@@ -459,7 +467,7 @@ export default function AuthPage() {
             </div>
             <form onSubmit={handleCreateOrg} className="p-6 space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="org-name">Organization name</Label>
+                <Label htmlFor="org-name">Organization name *</Label>
                 <Input
                   id="org-name"
                   placeholder="e.g. SilverClip Salons"
@@ -468,29 +476,35 @@ export default function AuthPage() {
                   disabled={isSubmitting}
                   required
                   autoFocus
+                  autoComplete="off"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="org-address">
-                  Business address{' '}
-                  <span className="text-[var(--text-muted)] font-normal">(optional)</span>
+                <Label
+                  htmlFor="org-google-places-input"
+                  className="flex items-center gap-2 text-[var(--text-primary)]"
+                >
+                  <MapPin className="h-4 w-4 text-[var(--text-muted)]" />
+                  Business location *
                 </Label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" />
-                  <Input
-                    id="org-address"
-                    className="pl-9"
-                    placeholder="e.g. 123 Main St, Mumbai"
-                    value={orgAddress}
-                    onChange={(e) => setOrgAddress(e.target.value)}
-                    disabled={isSubmitting}
-                  />
-                </div>
+                <GooglePlacesAutocomplete
+                  inputId="org-google-places-input"
+                  onPlaceSelected={setOrgSelectedPlace}
+                  placeholder="e.g., 123 Main Street, City, State"
+                  leftIcon={<MapPin className="h-4 w-4 text-[var(--text-muted)]" />}
+                  searchTypes={['establishment', 'geocode']}
+                  disabled={isSubmitting}
+                />
+                <p className="text-xs text-[var(--text-muted)]">
+                  Required: Search and select your business location
+                </p>
               </div>
               <Button
                 type="submit"
                 className="w-full"
-                disabled={isSubmitting || !orgName.trim()}
+                disabled={
+                  isSubmitting || !ist || !orgName.trim() || !orgSelectedPlace?.place_id
+                }
               >
                 {isSubmitting ? <Spinner className="mr-2 size-4" /> : null}
                 {isSubmitting ? 'Creating…' : 'Create organization'}
@@ -537,7 +551,7 @@ export default function AuthPage() {
 
         {/* ══ CREATE_LOCATION ════════════════════════════════════════════════ */}
         {phase === 'CREATE_LOCATION' && (
-          <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-hidden">
+          <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-visible">
             <div className="px-6 pt-6 pb-4 border-b border-[var(--border-default)]">
               <h2 className="font-display text-lg font-semibold text-[var(--text-primary)]">
                 Add your first location
@@ -555,11 +569,17 @@ export default function AuthPage() {
                 autoFocusName
                 nameInputId="loc-name"
                 placesInputId="loc-address-google"
+                requireSelectedPlace
+                placesSearchTypes={['establishment', 'geocode']}
               />
               <Button
                 type="submit"
                 className="w-full"
-                disabled={isSubmitting || !locName.trim()}
+                disabled={
+                  isSubmitting ||
+                  !locName.trim() ||
+                  !locSelectedPlace?.place_id
+                }
               >
                 {isSubmitting ? <Spinner className="mr-2 size-4" /> : null}
                 {isSubmitting ? 'Creating…' : 'Add location'}

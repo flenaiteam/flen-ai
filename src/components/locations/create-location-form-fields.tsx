@@ -15,6 +15,8 @@ export function CreateLocationFormFields({
   nameInputId,
   placesInputId,
   resetKey,
+  requireSelectedPlace = false,
+  placesSearchTypes,
 }: {
   name: string;
   onNameChange: (value: string) => void;
@@ -25,6 +27,10 @@ export function CreateLocationFormFields({
   placesInputId: string;
   /** Increment when the enclosing form is reset so the places input clears its internal state. */
   resetKey?: number;
+  /** When true, label business location as required (e.g. onboarding create-first-location). */
+  requireSelectedPlace?: boolean;
+  /** Pass through to Google Places autocomplete (e.g. establishment + geocode). */
+  placesSearchTypes?: string[];
 }) {
   return (
     <>
@@ -41,18 +47,40 @@ export function CreateLocationFormFields({
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor={placesInputId}>
-          Address{' '}
-          <span className="font-normal text-[var(--text-muted)]">(optional)</span>
+        <Label
+          htmlFor={placesInputId}
+          className={requireSelectedPlace ? 'flex items-center gap-2' : undefined}
+        >
+          {requireSelectedPlace ? (
+            <>
+              <MapPin className="h-4 w-4 text-[var(--text-muted)]" />
+              Business location <span className="text-[var(--text-primary)]">*</span>
+            </>
+          ) : (
+            <>
+              Address{' '}
+              <span className="font-normal text-[var(--text-muted)]">(optional)</span>
+            </>
+          )}
         </Label>
         <GooglePlacesAutocomplete
           key={resetKey}
           inputId={placesInputId}
           onPlaceSelected={onPlaceSelected}
-          placeholder="e.g. 456 Park Ave, Delhi"
+          placeholder={
+            requireSelectedPlace
+              ? 'e.g., 123 Main Street, City, State'
+              : 'e.g. 456 Park Ave, Delhi'
+          }
           leftIcon={<MapPin className="h-4 w-4 text-[var(--text-muted)]" />}
+          searchTypes={placesSearchTypes}
           disabled={disabled}
         />
+        {requireSelectedPlace && (
+          <p className="text-xs text-[var(--text-muted)]">
+            Required: Search and select your business location
+          </p>
+        )}
       </div>
     </>
   );
