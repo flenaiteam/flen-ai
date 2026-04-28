@@ -72,6 +72,7 @@ export default function AuthPage() {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { isAuthenticated, isInitialized } = useAuth();
+  const [authRedirectURL, setAuthRedirectURL] = useState<string | null>(null);
 
   const [exchangeToken, { isLoading: isExchanging }] = useExchangeTokenMutation();
   const [createOrganization, { isLoading: isCreatingOrg }] = useCreateOrganizationMutation();
@@ -99,6 +100,13 @@ export default function AuthPage() {
       router.replace('/dashboard');
     }
   }, [isInitialized, isAuthenticated, router]);
+
+  // Resolve auth redirect URL only on client to avoid SSR empty-string fallbacks.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const configured = process.env.NEXT_PUBLIC_STYTCH_REDIRECT_URL?.trim();
+    setAuthRedirectURL(configured?.length ? configured : `${window.location.origin}/authenticate`);
+  }, []);
 
   // ── Commit auth response to Redux + localStorage ─────────────────────────
 
@@ -306,76 +314,83 @@ export default function AuthPage() {
                 Continue with email or Google
               </p>
             </div>
-            <StytchB2B
-              config={{
-                authFlowType: 'Discovery',
-                products: [B2BProducts.emailMagicLinks, B2BProducts.oauth, B2BProducts.passwords],
-                emailMagicLinksOptions: {
-                  loginRedirectURL: `${typeof window !== 'undefined' ? window.location.origin : ''}/authenticate`,
-                  signupRedirectURL: `${typeof window !== 'undefined' ? window.location.origin : ''}/authenticate`,
-                },
-                passwordOptions: {
-                  loginRedirectURL: `${typeof window !== 'undefined' ? window.location.origin : ''}/authenticate`,
-                  resetPasswordRedirectURL: `${typeof window !== 'undefined' ? window.location.origin : ''}/authenticate`,
-                  resetPasswordExpirationMinutes: 30,
-                },
-                oauthOptions: {
-                  providers: [{ type: 'google' }],
-                  discoveryRedirectURL: `${typeof window !== 'undefined' ? window.location.origin : ''}/authenticate`,
-                },
-                disableCreateOrganization: true,
-                directCreateOrganizationForNoMembership: false,
-                sessionOptions: { sessionDurationMinutes: 60 },
-              }}
-              callbacks={{
-                onEvent: (event: { type: string; data: unknown }) => {
-                  const discoveryEvents = [
-                    'B2B_OAUTH_DISCOVERY_AUTHENTICATE',
-                    'B2B_MAGIC_LINK_DISCOVERY_AUTHENTICATE',
-                    'B2B_PASSWORD_DISCOVERY_AUTHENTICATE',
-                    'B2B_SSO_DISCOVERY_AUTHENTICATE',
-                  ];
-                  if (discoveryEvents.includes(event.type)) {
-                    onDiscoveryAuth(event.data as DiscoveryData);
-                  }
-                },
-              }}
-              styles={{
-                fontFamily: 'DM Sans, sans-serif',
-                container: {
-                  width: '100%',
-                  backgroundColor: 'transparent',
-                  borderColor: 'transparent',
-                },
-                colors: {
-                  primary: 'var(--text-primary)',
-                  secondary: 'var(--text-secondary)',
-                  success: '#22c55e',
-                  error: '#ef4444',
-                },
-                buttons: {
-                  primary: {
-                    textColor: '#ffffff',
-                    backgroundColor: '#d946ef',
-                    borderRadius: '8px',
-                    borderColor: '#d946ef',
+            {authRedirectURL ? (
+              <StytchB2B
+                config={{
+                  authFlowType: 'Discovery',
+                  products: [B2BProducts.emailMagicLinks, B2BProducts.oauth, B2BProducts.passwords],
+                  emailMagicLinksOptions: {
+                    discoveryRedirectURL: authRedirectURL,
+                    loginRedirectURL: authRedirectURL,
+                    signupRedirectURL: authRedirectURL,
                   },
-                  secondary: {
-                    textColor: 'var(--text-primary)',
+                  passwordOptions: {
+                    loginRedirectURL: authRedirectURL,
+                    resetPasswordRedirectURL: authRedirectURL,
+                    resetPasswordExpirationMinutes: 30,
+                  },
+                  oauthOptions: {
+                    providers: [{ type: 'google' }],
+                    discoveryRedirectURL: authRedirectURL,
+                  },
+                  disableCreateOrganization: true,
+                  directCreateOrganizationForNoMembership: false,
+                  sessionOptions: { sessionDurationMinutes: 60 },
+                }}
+                callbacks={{
+                  onEvent: (event: { type: string; data: unknown }) => {
+                    const discoveryEvents = [
+                      'B2B_OAUTH_DISCOVERY_AUTHENTICATE',
+                      'B2B_MAGIC_LINK_DISCOVERY_AUTHENTICATE',
+                      'B2B_PASSWORD_DISCOVERY_AUTHENTICATE',
+                      'B2B_SSO_DISCOVERY_AUTHENTICATE',
+                    ];
+                    if (discoveryEvents.includes(event.type)) {
+                      onDiscoveryAuth(event.data as DiscoveryData);
+                    }
+                  },
+                }}
+                styles={{
+                  fontFamily: 'DM Sans, sans-serif',
+                  container: {
+                    width: '100%',
                     backgroundColor: 'transparent',
-                    borderRadius: '8px',
-                    borderColor: 'var(--border-default)',
+                    borderColor: 'transparent',
                   },
-                },
-                inputs: {
-                  backgroundColor: 'var(--bg-page)',
-                  borderColor: 'var(--border-default)',
-                  borderRadius: '8px',
-                  textColor: 'var(--text-primary)',
-                  placeholderColor: 'var(--text-muted)',
-                },
-              }}
-            />
+                  colors: {
+                    primary: 'var(--text-primary)',
+                    secondary: 'var(--text-secondary)',
+                    success: '#22c55e',
+                    error: '#ef4444',
+                  },
+                  buttons: {
+                    primary: {
+                      textColor: '#ffffff',
+                      backgroundColor: '#d946ef',
+                      borderRadius: '8px',
+                      borderColor: '#d946ef',
+                    },
+                    secondary: {
+                      textColor: 'var(--text-primary)',
+                      backgroundColor: 'transparent',
+                      borderRadius: '8px',
+                      borderColor: 'var(--border-default)',
+                    },
+                  },
+                  inputs: {
+                    backgroundColor: 'var(--bg-page)',
+                    borderColor: 'var(--border-default)',
+                    borderRadius: '8px',
+                    textColor: 'var(--text-primary)',
+                    placeholderColor: 'var(--text-muted)',
+                  },
+                }}
+              />
+            ) : (
+              <div className="flex items-center justify-center py-10">
+                <Spinner className="size-5" />
+              </div>
+            )}
           </div>
         )}
 
