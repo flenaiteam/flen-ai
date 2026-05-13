@@ -9,12 +9,14 @@ import type { RootState } from "@/lib/redux/store";
 import { useAuth } from "@/hooks/use-auth";
 import {
   AlertCircle,
+  BarChart3,
   Bell,
   Building2,
   FileText,
   HelpCircle,
   LayoutDashboard,
   LayoutGrid,
+  Loader2,
   LogOut,
   MapPin,
   MessageSquare,
@@ -23,11 +25,14 @@ import {
   Plus,
   RefreshCw,
   Search,
+  Settings,
   Sun,
   Target,
-  BarChart3,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ConfirmAlertDialog } from "@/components/ui/confirm-alert-dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -56,9 +61,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Spinner } from "@/components/ui/spinner";
 import type { Location } from "@/lib/api/baseApi";
-import { useGetLocationsQuery } from "@/lib/api/baseApi";
+import { useGetLocationsQuery, useSyncGBPProfileInfoMutation } from "@/lib/api/baseApi";
 import { setCurrentLocation, setLocationsList } from "@/lib/redux/slices/locationsSlice";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/lib/redux/store";
@@ -90,7 +94,7 @@ function getInitials(name?: string | null): string {
 export default function GbpLayout({ children }: { children: React.ReactNode }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [syncing, setSyncing] = useState(false);
+  const [syncConfirmOpen, setSyncConfirmOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
@@ -103,6 +107,9 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
   const { data: apiLocations } = useGetLocationsQuery(undefined, {
     skip: !isInitialized || !isAuthenticated || !organization?.id,
   });
+
+  const [syncProfileInfo, { isLoading: isSyncing }] = useSyncGBPProfileInfoMutation();
+  const locationId = currentLocation?.public_id ?? "";
 
   useEffect(() => {
     if (apiLocations?.length) {
@@ -154,6 +161,8 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
+    // Client-only flag so theme icon matches SSR (default) after hydration without flicker mismatches.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional post-hydration mount guard for next-themes
     setMounted(true);
   }, []);
 
@@ -167,9 +176,17 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
     });
   }, [pathname]);
 
-  function handleSync() {
-    setSyncing(true);
-    setTimeout(() => setSyncing(false), 1200);
+  async function performSync() {
+    if (!locationId) {
+      toast.error("Select a location first");
+      return;
+    }
+    try {
+      const res = await syncProfileInfo(locationId).unwrap();
+      toast.success("Sync started", { description: res?.message ?? "Profile sync queued." });
+    } catch {
+      toast.error("Unable to sync profile");
+    }
   }
 
   const handleLocationChange = useCallback(
@@ -263,20 +280,47 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
             {/* Sync */}
             <Tooltip>
               <TooltipTrigger
-                onClick={handleSync}
-                className={cn(
-                  "inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--text-muted)] hover:bg-[var(--bg-subtle)]",
-                  syncing && "pointer-events-none opacity-50"
-                )}
+                render={
+                  <Button
+                    type="button"
+                    variant="base-ghost"
+                    size="icon"
+                    className="h-8 w-8 shrink-0"
+                    disabled={isSyncing || !locationId}
+                    onClick={() => setSyncConfirmOpen(true)}
+                  />
+                }
               >
-                {syncing ? <Spinner className="size-4" /> : <RefreshCw className="h-4 w-4" />}
+                {isSyncing ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4" />
+                )}
               </TooltipTrigger>
               <TooltipContent>Sync from Google</TooltipContent>
             </Tooltip>
 
+            {/* Dummy toolbar icons (visual alignment) */}
+            <Tooltip>
+              <TooltipTrigger render={<Button type="button" variant="base-ghost" size="icon" className="h-8 w-8 shrink-0" disabled />}>
+                <BarChart3 className="h-4 w-4" />
+              </TooltipTrigger>
+              <TooltipContent>Coming soon</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger render={<Button type="button" variant="base-ghost" size="icon" className="h-8 w-8 shrink-0" disabled />}>
+                <Settings className="h-4 w-4" />
+              </TooltipTrigger>
+              <TooltipContent>Coming soon</TooltipContent>
+            </Tooltip>
+
             {/* Notifications */}
             <Sheet>
-              <SheetTrigger className="relative inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--text-muted)] hover:bg-[var(--bg-subtle)]">
+              <SheetTrigger
+                render={
+                  <Button type="button" variant="base-ghost" size="icon" className="relative h-8 w-8 shrink-0" />
+                }
+              >
                 <Bell className="h-4 w-4" />
                 {notifications.length > 0 && (
                   <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-error-500 ring-2 ring-[var(--bg-surface)]" />
@@ -313,19 +357,19 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
 
             {/* Apps + Help + More */}
             <Tooltip>
-              <TooltipTrigger className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--text-muted)] hover:bg-[var(--bg-subtle)]">
+              <TooltipTrigger render={<Button type="button" variant="base-ghost" size="icon" className="h-8 w-8 shrink-0" />}>
                 <LayoutGrid className="h-4 w-4" />
               </TooltipTrigger>
               <TooltipContent>Apps</TooltipContent>
             </Tooltip>
             <Tooltip>
-              <TooltipTrigger className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--text-muted)] hover:bg-[var(--bg-subtle)]">
+              <TooltipTrigger render={<Button type="button" variant="base-ghost" size="icon" className="h-8 w-8 shrink-0" />}>
                 <HelpCircle className="h-4 w-4" />
               </TooltipTrigger>
               <TooltipContent>Help</TooltipContent>
             </Tooltip>
             <Tooltip>
-              <TooltipTrigger className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--text-muted)] hover:bg-[var(--bg-subtle)]">
+              <TooltipTrigger render={<Button type="button" variant="base-ghost" size="icon" className="h-8 w-8 shrink-0" />}>
                 <MoreHorizontal className="h-4 w-4" />
               </TooltipTrigger>
               <TooltipContent>More</TooltipContent>
@@ -334,8 +378,15 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
             {/* Theme toggle */}
             <Tooltip>
               <TooltipTrigger
-                onClick={() => setTheme(mounted && theme === "dark" ? "light" : "dark")}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--text-muted)] hover:bg-[var(--bg-subtle)]"
+                render={
+                  <Button
+                    type="button"
+                    variant="base-ghost"
+                    size="icon"
+                    className="h-8 w-8 shrink-0"
+                    onClick={() => setTheme(mounted && theme === "dark" ? "light" : "dark")}
+                  />
+                }
               >
                 {mounted && theme === "dark" ? (
                   <Sun className="h-4 w-4" />
@@ -379,6 +430,17 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
             </DropdownMenu>
           </div>
         </header>
+
+        <ConfirmAlertDialog
+          title="Sync from Google?"
+          description="We'll queue a sync to pull your latest Google Business Profile data for this location."
+          open={syncConfirmOpen}
+          onOpenChange={setSyncConfirmOpen}
+          cancelLabel="Cancel"
+          confirmLabel="Sync"
+          confirmVariant="brand"
+          onConfirm={() => void performSync()}
+        />
 
         {/* ── Body ────────────────────────────────────────────────────────── */}
         <div className="flex min-w-0 w-full flex-1 flex-col gap-6 p-4 sm:p-6 md:flex-row md:items-start">
