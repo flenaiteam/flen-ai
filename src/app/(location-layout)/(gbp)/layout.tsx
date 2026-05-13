@@ -12,6 +12,7 @@ import {
   BarChart3,
   Bell,
   Building2,
+  Columns2,
   FileText,
   HelpCircle,
   LayoutDashboard,
@@ -80,6 +81,7 @@ const GBP_SECTIONS = [
   // { id: "search-rankings", label: "Search Rankings", icon: BarChart3, href: "/search-rankings" },
   { id: "competitors", label: "Competitors", icon: Target, href: "/competitors" },
   { id: "ranking-grid", label: "Ranking Grid", icon: LayoutGrid, href: "/ranking-grid" },
+  { id: "collage", label: "Collage", icon: Columns2, href: "/collage" },
 ];
 
 function getInitials(name?: string | null): string {

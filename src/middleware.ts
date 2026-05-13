@@ -22,6 +22,7 @@ const PROTECTED_PREFIXES = [
   '/keywords',
   '/search-rankings',
   '/competitors',
+  '/collage',
   '/profile',
   '/locations',
 ];
