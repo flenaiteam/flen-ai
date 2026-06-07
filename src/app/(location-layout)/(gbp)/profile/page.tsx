@@ -534,7 +534,10 @@ export default function ProfilePage() {
   const { current: currentLocation } = useSelector((s: RootState) => s.locations);
   const locationId = currentLocation?.public_id ?? '';
 
-  const { data, isLoading, error, refetch } = useGetGBPProfileInfoQuery(locationId, { skip: !locationId });
+  const { data, isLoading, isFetching, isUninitialized, error, refetch } = useGetGBPProfileInfoQuery(
+    locationId,
+    { skip: !locationId }
+  );
   const [syncProfileInfo, { isLoading: isSyncing }] = useSyncGBPProfileInfoMutation();
   const [fixBusinessAbout, { isLoading: isImprovingAbout }] = useFixBusinessAboutMutation();
   const [runHoursOptimizer, { isLoading: isFixingHours }] = useRunGBPHoursOptimizerMutation();
@@ -561,6 +564,8 @@ export default function ProfilePage() {
 
   const response = data as ProfileInfoResponse | undefined;
   const profile = response?.data?.profile;
+  const isProfileLoading =
+    !locationId || isUninitialized || isLoading || (isFetching && !profile);
   const completeness = response?.data?.completeness_score ?? 0;
   const missingFields = response?.data?.missing_fields ?? [];
 
@@ -748,7 +753,7 @@ export default function ProfilePage() {
     </div>
   );
 
-  if (isLoading) {
+  if (isProfileLoading) {
     return (
       <div className="space-y-6 p-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

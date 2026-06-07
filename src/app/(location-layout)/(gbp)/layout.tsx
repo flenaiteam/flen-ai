@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -19,6 +19,7 @@ import {
   LayoutGrid,
   Loader2,
   LogOut,
+  Menu,
   MapPin,
   MessageSquare,
   Moon,
@@ -93,14 +94,47 @@ function getInitials(name?: string | null): string {
     .join("");
 }
 
+function GbpSectionNavLinks({
+  pathname,
+  onLinkClick,
+}: {
+  pathname: string;
+  onLinkClick?: () => void;
+}) {
+  return (
+    <>
+      {GBP_SECTIONS.map((item) => {
+        const Icon = item.icon;
+        const isActive = pathname === item.href;
+        return (
+          <Link
+            key={item.id}
+            href={item.href}
+            onClick={onLinkClick}
+            className={cn(
+              "inline-flex w-full items-center justify-start gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm transition-colors",
+              isActive
+                ? "bg-soft-brand-bg text-soft-brand-text"
+                : "text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]"
+            )}
+          >
+            <Icon className="h-4 w-4 shrink-0" />
+            <span className="whitespace-nowrap">{item.label}</span>
+          </Link>
+        );
+      })}
+    </>
+  );
+}
+
 export default function GbpLayout({ children }: { children: React.ReactNode }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [syncConfirmOpen, setSyncConfirmOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
-  const tabRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
 
   const { user, organization, location: currentLocation, logout, isAuthenticated, isInitialized } =
     useAuth();
@@ -169,13 +203,7 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const activeTab = GBP_SECTIONS.find((item) => pathname === item.href);
-    if (!activeTab) return;
-    tabRefs.current[activeTab.id]?.scrollIntoView({
-      behavior: "smooth",
-      inline: "center",
-      block: "nearest",
-    });
+    setNavOpen(false);
   }, [pathname]);
 
   async function performSync() {
@@ -214,6 +242,34 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
         <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center justify-between gap-4 border-b border-border/80 bg-background/85 px-4 backdrop-blur-sm sm:px-6">
           {/* Logo + org */}
           <div className="flex items-center gap-2 shrink-0">
+            <div className="flex lg:hidden">
+              <Sheet open={navOpen} onOpenChange={setNavOpen}>
+                <SheetTrigger
+                  render={
+                    <Button
+                      type="button"
+                      variant="base-ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0 lg:hidden"
+                      aria-label="Open navigation"
+                    />
+                  }
+                >
+                  <Menu className="h-4 w-4" />
+                </SheetTrigger>
+                <SheetContent side="left" className="gap-0 p-0 sm:max-w-none" style={{ width: 240 }}>
+                  <SheetHeader className="border-b border-border/70 p-4">
+                    <SheetTitle>Navigation</SheetTitle>
+                  </SheetHeader>
+                  <nav className="flex flex-col gap-2 p-3">
+                    <GbpSectionNavLinks
+                      pathname={pathname}
+                      onLinkClick={() => setNavOpen(false)}
+                    />
+                  </nav>
+                </SheetContent>
+              </Sheet>
+            </div>
             <Link href="/dashboard" className="font-display text-lg font-bold text-[var(--text-primary)]">
               flen<span className="text-brand-500">.</span>ai
             </Link>
@@ -445,31 +501,10 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
         />
 
         {/* ── Body ────────────────────────────────────────────────────────── */}
-        <div className="flex min-w-0 w-full flex-1 flex-col gap-6 p-4 sm:p-6 md:flex-row md:items-start">
+        <div className="flex min-w-0 w-full flex-1 flex-col gap-6 p-4 sm:p-6 lg:flex-row lg:items-start">
           {/* Sidebar nav */}
-          <nav className="flex h-auto w-full shrink-0 flex-row gap-1 overflow-x-auto rounded-xl border border-border/70 bg-background/90 p-1 md:sticky md:top-20 md:h-fit md:w-64 md:flex-col md:gap-2 md:overflow-visible md:p-3">
-            {GBP_SECTIONS.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  ref={(el) => {
-                    tabRefs.current[item.id] = el;
-                  }}
-                  key={item.id}
-                  href={item.href}
-                  className={cn(
-                    "inline-flex w-auto items-center justify-start gap-2 whitespace-nowrap border-b-2 px-3 py-2 text-sm transition-colors md:w-full md:border-b-0",
-                    isActive
-                      ? "border-brand-500 text-brand-600 md:rounded-lg md:border-none md:bg-soft-brand-bg md:text-soft-brand-text"
-                      : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] md:rounded-lg md:hover:bg-[var(--bg-subtle)]"
-                  )}
-                >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  <span className="whitespace-nowrap">{item.label}</span>
-                </Link>
-              );
-            })}
+          <nav style={{ width: 240 }} className="hidden shrink-0 flex-col gap-2 rounded-xl border border-border/70 bg-background/90 p-3 lg:sticky lg:top-20 lg:flex lg:h-fit lg:overflow-visible">
+            <GbpSectionNavLinks pathname={pathname} />
           </nav>
 
           {/* Page content */}
