@@ -817,10 +817,11 @@ export default function ProfilePage() {
         <div className="relative isolate aspect-video w-full max-h-[min(40vh,420px)] min-h-[180px] overflow-hidden bg-muted">
           {profile.main_image ? (
             <img
-              // src={profile.main_image}
-              src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAFtAg6qCsJZqPWXBswy9bGZcZ7nv7winoLSwlUrgHBhjcuXAFJMk5UKH9yb8Fo5T6nkrTtcctv21PLZrDt3AREXSy9Xn8rKyEiPamZ17e94Ejcc2D8Fn6D9G7vw-UaTuhWr1LpVombkb_Op=w408-h461-k-no"
+              // src={'https://lh3.googleusercontent.com/p/AF1QipNfdvaXp9ETqykV_4G0nJs5PSd5B_Uhn5i09OHB=w408-h306-k-no'}
+              src={profile.main_image}
+              // src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAFtAg6qCsJZqPWXBswy9bGZcZ7nv7winoLSwlUrgHBhjcuXAFJMk5UKH9yb8Fo5T6nkrTtcctv21PLZrDt3AREXSy9Xn8rKyEiPamZ17e94Ejcc2D8Fn6D9G7vw-UaTuhWr1LpVombkb_Op=w408-h461-k-no"
 
-              alt={profile.title ? `Cover photo — ${profile.title}` : 'Business cover photo'}
+              alt={profile?.title ? `Cover photo — ${profile?.title}` : 'Business cover photo'}
               className="absolute inset-0 h-full w-full object-cover object-center"
             />
           ) : (

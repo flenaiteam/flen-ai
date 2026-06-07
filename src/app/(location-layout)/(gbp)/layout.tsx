@@ -229,13 +229,13 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* Global search */}
-          <div className="hidden md:flex relative flex-1 max-w-md">
+          {/* <div className="hidden md:flex relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
             <Input
               placeholder="Search GBP insights, reviews, and locations"
               className="pl-9 h-9 text-sm"
             />
-          </div>
+          </div> */}
 
           {/* Right controls */}
           <div className="flex items-center gap-2">
@@ -262,13 +262,13 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
                         {loc.name}
                       </SelectItem>
                     ))}
-                    <SelectSeparator />
+                    {/* <SelectSeparator />
                     <SelectItem value={ADD_LOCATION_VALUE}>
                       <span className="flex items-center gap-2">
                         <Plus className="h-3.5 w-3.5 shrink-0" />
                         Add new location
                       </span>
-                    </SelectItem>
+                    </SelectItem> */}
                   </SelectContent>
                 </Select>
               </div>
@@ -299,11 +299,11 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
                   <RefreshCw className="h-4 w-4" />
                 )}
               </TooltipTrigger>
-              <TooltipContent>Sync from Google</TooltipContent>
+              <TooltipContent>Sync</TooltipContent>
             </Tooltip>
 
             {/* Dummy toolbar icons (visual alignment) */}
-            <Tooltip>
+            {/* <Tooltip>
               <TooltipTrigger render={<Button type="button" variant="base-ghost" size="icon" className="h-8 w-8 shrink-0" disabled />}>
                 <BarChart3 className="h-4 w-4" />
               </TooltipTrigger>
@@ -314,7 +314,7 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
                 <Settings className="h-4 w-4" />
               </TooltipTrigger>
               <TooltipContent>Coming soon</TooltipContent>
-            </Tooltip>
+            </Tooltip> */}
 
             {/* Notifications */}
             <Sheet>
@@ -358,7 +358,7 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
             </Sheet>
 
             {/* Apps + Help + More */}
-            <Tooltip>
+            {/* <Tooltip>
               <TooltipTrigger render={<Button type="button" variant="base-ghost" size="icon" className="h-8 w-8 shrink-0" />}>
                 <LayoutGrid className="h-4 w-4" />
               </TooltipTrigger>
@@ -375,7 +375,7 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
                 <MoreHorizontal className="h-4 w-4" />
               </TooltipTrigger>
               <TooltipContent>More</TooltipContent>
-            </Tooltip>
+            </Tooltip> */}
 
             {/* Theme toggle */}
             <Tooltip>

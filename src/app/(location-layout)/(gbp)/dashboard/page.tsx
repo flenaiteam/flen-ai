@@ -682,123 +682,8 @@ export default function DashboardPage() {
         <DateRangeSegmentedControl dateRange={dateRange} onChange={setDateRange} />
       </div>
 
-      {/* No GBP connection — show connect card instead of all metric sections */}
-      {isNoConnection ? (
-        <ConnectGBPCard locationId={locationId} />
-      ) : (
-        <>
-          {/* Action metric stat cards */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {showLoadingState
-              ? Array.from({ length: 6 }).map((_, i) => <StatCardSkeleton key={i} />)
-              : ACTION_METRICS.map((metric) => {
-                  const meta = METRIC_META[metric];
-                  const total = metricTotals[metric] ?? 0;
-                  const { trend, trendValue } = formatChangeTrend(compareMap[metric]);
-                  return (
-                    <StatCard
-                      key={metric}
-                      label={meta.label}
-                      value={total.toLocaleString()}
-                      trend={trend}
-                      trendValue={trendValue}
-                      icon={meta.icon}
-                    />
-                  );
-                })}
-          </div>
-
-          {/* Performance time-series chart */}
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <CardTitle className="text-base font-semibold">
-                  Performance Over Time
-                </CardTitle>
-                <div className="flex items-center gap-4">
-                  {CHART_METRICS.map((m) => (
-                    <span key={m} className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
-                      <span
-                        className="inline-block h-2.5 w-2.5 rounded-full"
-                        style={{ backgroundColor: CHART_COLORS[m] }}
-                      />
-                      {METRIC_META[m].label}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {showLoadingState ? (
-                <Skeleton className="h-[240px] w-full rounded-md" />
-              ) : chartData.length === 0 ? (
-                <div className="flex h-[240px] items-center justify-center text-sm text-[var(--text-muted)]">
-                  No data for this period
-                </div>
-              ) : (
-                <div className="h-[240px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart
-                      data={chartData}
-                      margin={{ top: 4, right: 4, left: -16, bottom: 4 }}
-                    >
-                      <defs>
-                        {CHART_METRICS.map((m) => (
-                          <linearGradient key={m} id={`grad-${m}`} x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={CHART_COLORS[m]} stopOpacity={0.25} />
-                            <stop offset="100%" stopColor={CHART_COLORS[m]} stopOpacity={0} />
-                          </linearGradient>
-                        ))}
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border-default)" vertical={false} />
-                      <XAxis
-                        dataKey="date"
-                        tick={{ fontSize: 11, fill: 'var(--text-muted)' }}
-                        axisLine={false}
-                        tickLine={false}
-                        interval="preserveStartEnd"
-                      />
-                      <YAxis
-                        tick={{ fontSize: 11, fill: 'var(--text-muted)' }}
-                        axisLine={false}
-                        tickLine={false}
-                        allowDecimals={false}
-                      />
-                      <RechartsTooltip
-                        contentStyle={{
-                          backgroundColor: 'var(--bg-surface)',
-                          border: '1px solid var(--border-default)',
-                          borderRadius: '8px',
-                          fontSize: '12px',
-                        }}
-                        labelStyle={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: 4 }}
-                        itemStyle={{ color: 'var(--text-secondary)' }}
-                        formatter={(value: number, name: string) => [
-                          value.toLocaleString(),
-                          METRIC_META[name]?.label ?? name,
-                        ]}
-                      />
-                      {CHART_METRICS.map((m) => (
-                        <Area
-                          key={m}
-                          type="monotone"
-                          dataKey={m}
-                          stroke={CHART_COLORS[m]}
-                          strokeWidth={2}
-                          fill={`url(#grad-${m})`}
-                          dot={false}
-                          activeDot={{ r: 4 }}
-                        />
-                      ))}
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-              
-          {/* GBP overview (migrated from fe-flen, adapted to flen-ai primitives) */}
-          <section className="space-y-4">
+       {/* GBP overview (migrated from fe-flen, adapted to flen-ai primitives) */}
+       <section className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className="text-base font-semibold text-[var(--text-primary)]">GBP Overview</h2>
@@ -897,6 +782,123 @@ export default function DashboardPage() {
               </div>
             )}
           </section>
+
+      {/* No GBP connection — show connect card instead of all metric sections */}
+      {isNoConnection ? (
+        <ConnectGBPCard locationId={locationId} />
+      ) : (
+        <>
+          {/* Action metric stat cards */}
+          {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {showLoadingState
+              ? Array.from({ length: 6 }).map((_, i) => <StatCardSkeleton key={i} />)
+              : ACTION_METRICS.map((metric) => {
+                  const meta = METRIC_META[metric];
+                  const total = metricTotals[metric] ?? 0;
+                  const { trend, trendValue } = formatChangeTrend(compareMap[metric]);
+                  return (
+                    <StatCard
+                      key={metric}
+                      label={meta.label}
+                      value={total.toLocaleString()}
+                      trend={trend}
+                      trendValue={trendValue}
+                      icon={meta.icon}
+                    />
+                  );
+                })}
+          </div> */}
+
+          {/* Performance time-series chart */}
+          {/* <Card>
+            <CardHeader className="pb-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <CardTitle className="text-base font-semibold">
+                  Performance Over Time
+                </CardTitle>
+                <div className="flex items-center gap-4">
+                  {CHART_METRICS.map((m) => (
+                    <span key={m} className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
+                      <span
+                        className="inline-block h-2.5 w-2.5 rounded-full"
+                        style={{ backgroundColor: CHART_COLORS[m] }}
+                      />
+                      {METRIC_META[m].label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              {showLoadingState ? (
+                <Skeleton className="h-[240px] w-full rounded-md" />
+              ) : chartData.length === 0 ? (
+                <div className="flex h-[240px] items-center justify-center text-sm text-[var(--text-muted)]">
+                  No data for this period
+                </div>
+              ) : (
+                <div className="h-[240px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart
+                      data={chartData}
+                      margin={{ top: 4, right: 4, left: -16, bottom: 4 }}
+                    >
+                      <defs>
+                        {CHART_METRICS.map((m) => (
+                          <linearGradient key={m} id={`grad-${m}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor={CHART_COLORS[m]} stopOpacity={0.25} />
+                            <stop offset="100%" stopColor={CHART_COLORS[m]} stopOpacity={0} />
+                          </linearGradient>
+                        ))}
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border-default)" vertical={false} />
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: 11, fill: 'var(--text-muted)' }}
+                        axisLine={false}
+                        tickLine={false}
+                        interval="preserveStartEnd"
+                      />
+                      <YAxis
+                        tick={{ fontSize: 11, fill: 'var(--text-muted)' }}
+                        axisLine={false}
+                        tickLine={false}
+                        allowDecimals={false}
+                      />
+                      <RechartsTooltip
+                        contentStyle={{
+                          backgroundColor: 'var(--bg-surface)',
+                          border: '1px solid var(--border-default)',
+                          borderRadius: '8px',
+                          fontSize: '12px',
+                        }}
+                        labelStyle={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: 4 }}
+                        itemStyle={{ color: 'var(--text-secondary)' }}
+                        formatter={(value: number, name: string) => [
+                          value.toLocaleString(),
+                          METRIC_META[name]?.label ?? name,
+                        ]}
+                      />
+                      {CHART_METRICS.map((m) => (
+                        <Area
+                          key={m}
+                          type="monotone"
+                          dataKey={m}
+                          stroke={CHART_COLORS[m]}
+                          strokeWidth={2}
+                          fill={`url(#grad-${m})`}
+                          dot={false}
+                          activeDot={{ r: 4 }}
+                        />
+                      ))}
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+               */}
+         
 
           {/* Search keywords */}
           <Card>
