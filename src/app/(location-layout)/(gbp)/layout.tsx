@@ -434,7 +434,7 @@ export default function GbpLayout({ children }: { children: React.ReactNode }) {
         </header>
 
         <ConfirmAlertDialog
-          title="Sync from Google?"
+          title="Sync data?"
           description="We'll queue a sync to pull your latest Google Business Profile data for this location."
           open={syncConfirmOpen}
           onOpenChange={setSyncConfirmOpen}

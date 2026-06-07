@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   Check,
   Clock,
+  DollarSign,
   Eye,
   ExternalLink,
   FileText,
@@ -795,7 +796,7 @@ export default function ProfilePage() {
         <div className="flex flex-wrap gap-2">
           <Button variant="base-outline" onClick={handleSync} disabled={isSyncing}>
             {isSyncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-            Sync from Google
+            Sync data
           </Button>
         </div>
       </div>
@@ -814,24 +815,23 @@ export default function ProfilePage() {
       </div>
 
       <Card className="overflow-hidden rounded-lg border border-border bg-background shadow-none">
-        <div className="relative isolate aspect-video w-full max-h-[min(40vh,420px)] min-h-[180px] overflow-hidden bg-muted">
-          {profile.main_image ? (
-            <img
-              // src={'https://lh3.googleusercontent.com/p/AF1QipNfdvaXp9ETqykV_4G0nJs5PSd5B_Uhn5i09OHB=w408-h306-k-no'}
-              src={profile.main_image}
-              // src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAFtAg6qCsJZqPWXBswy9bGZcZ7nv7winoLSwlUrgHBhjcuXAFJMk5UKH9yb8Fo5T6nkrTtcctv21PLZrDt3AREXSy9Xn8rKyEiPamZ17e94Ejcc2D8Fn6D9G7vw-UaTuhWr1LpVombkb_Op=w408-h461-k-no"
-
-              alt={profile?.title ? `Cover photo — ${profile?.title}` : 'Business cover photo'}
-              className="absolute inset-0 h-full w-full object-cover object-center"
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-neutral-100 to-neutral-200 dark:from-neutral-900 dark:to-neutral-800">
-              <ImageIcon className="h-10 w-10 text-neutral-400" />
-            </div>
-          )}
-        </div>
         <div className="space-y-4 p-4">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+            <div className="h-[90px] w-[90px]  overflow-hidden rounded-lg bg-muted md:h-[180px] max-w-[180px md:w-[180px] max-h-[180px">
+              {profile.main_image ? (
+                <img
+                  src={profile.main_image}
+                  alt={profile?.title ? `Cover photo — ${profile?.title}` : 'Business cover photo'}
+                  className="h-full w-full object-cover object-center"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-r from-neutral-100 to-neutral-200 dark:from-neutral-900 dark:to-neutral-800">
+                  <ImageIcon className="h-8 w-8 text-neutral-400 md:h-10 md:w-10" />
+                </div>
+              )}
+            </div>
+
+            <div className="flex min-w-0 flex-1 flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div className="min-w-0 flex-1 space-y-4">
               <div>
                 <h2 className="max-w-full break-words text-lg font-semibold tracking-tight text-foreground sm:text-xl">
@@ -849,7 +849,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <div className="rounded-lg border border-border bg-muted/20 px-3 py-3">
+              <div className="rounded-lg ">
                 <div className="flex flex-col gap-3">
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                     <span className="text-base font-semibold tabular-nums text-foreground">
@@ -860,13 +860,19 @@ export default function ProfilePage() {
                       ({(profile.rating_votes_count ?? 0).toLocaleString()} reviews)
                     </span>
                   </div>
-                  {profile.category ? <span className="text-sm font-medium text-foreground">{profile.category}</span> : null}
-                  {priceLabel ? <span className="text-sm text-muted-foreground">{priceLabel}</span> : null}
-                </div>
-              </div>
-            </div>
-
-            {mapsUrl ? (
+                  {profile.category ? (
+                    <span className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground">
+                      <Tag className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      {profile.category}
+                    </span>
+                  ) : null}
+                  {priceLabel ? (
+                    <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <DollarSign className="h-3.5 w-3.5 shrink-0" />
+                      {priceLabel}
+                    </span>
+                  ) : null}
+                  {mapsUrl ? (
               <Button size="sm" variant="base-outline" className="w-full shrink-0 lg:w-auto lg:self-start" asChild>
                 <a href={mapsUrl} target="_blank" rel="noopener noreferrer">
                   View on Maps
@@ -879,6 +885,10 @@ export default function ProfilePage() {
                 <ExternalLink className="ml-2 h-3.5 w-3.5" />
               </Button>
             )}
+                </div>
+              </div>
+            </div>
+            </div>
           </div>
 
           <div>
