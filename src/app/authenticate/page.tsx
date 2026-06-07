@@ -326,7 +326,8 @@ export default function AuthPage() {
               <StytchB2B
                 config={{
                   authFlowType: 'Discovery',
-                  products: [B2BProducts.emailMagicLinks, B2BProducts.oauth, B2BProducts.passwords],
+                  products: [  B2BProducts.passwords],
+                  // products: [B2BProducts.emailMagicLinks, B2BProducts.oauth, B2BProducts.passwords],
                   emailMagicLinksOptions: {
                     discoveryRedirectURL: authRedirectURL,
                     loginRedirectURL: authRedirectURL,
